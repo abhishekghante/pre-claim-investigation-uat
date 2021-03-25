@@ -28,7 +28,6 @@ public class UserDAOImpl implements UserDAO{
 		this.template = template;
 	}
 
-	@Override
 	public List<UserRole> role_lists() {
 		String sql = "select * from user_role where status = 1";
 		return template.query(sql, new RowMapper<UserRole>(){			
@@ -278,12 +277,12 @@ public class UserDAOImpl implements UserDAO{
 		try
 		{
 			String sql = "UPDATE admin_user SET full_name = ?, role_name = ?, user_email = ?, "
-					+ "password = ?, status = ?, user_image = ?, city = ?, state = ?, mobile_number = ?, "
+					+ "password = ?, status = ?, user_image = ?, city = ?, state = ?, fees =?, mobile_number = ?, "
 					+ "address1 = ?, address2 = ?, address3 = ?, updatedDate = getdate(), updatedBy = ? "
 					+ "where user_id = ?";
 			template.update(sql, user_details.getFull_name(), user_details.getAccount_type(),
 					user_details.getUser_email(), user_details.getPassword(), user_details.getStatus(),
-					user_details.getUserimage(), user_details.getCity(),user_details.getState(), 
+					user_details.getUserimage(), user_details.getCity(),user_details.getState(),user_details.getFees(), 
 					user_details.getContactNumber(), user_details.getAddress1(), user_details.getAddress2(), 
 					user_details.getAddress3(), user_details.getUpdatedBy(), user_details.getUserID());
 		}

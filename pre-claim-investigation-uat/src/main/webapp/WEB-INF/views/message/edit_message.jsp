@@ -7,12 +7,13 @@
 <%@page import="com.preclaim.models.IntimationType"%>
 <%@page import="com.preclaim.models.CaseDetails"%>
 <%@page import="com.preclaim.models.CaseSubStatus"%>
+<%@page import="com.preclaim.models.CaseStatus"%>
+<%@page import="com.preclaim.models.CaseCategory"%>
 <%
 List<String>user_permission=(List<String>)session.getAttribute("user_permission");
 CaseDetails case_detail = (CaseDetails) session.getAttribute("case_detail");
 session.removeAttribute("case_detail");
 List<CaseSubStatus> CaseSubStatus = (List<CaseSubStatus>) session.getAttribute("level");
-System.out.println(CaseSubStatus);
 session.removeAttribute("level");
 List<InvestigationType> investigationList = (List<InvestigationType>) session.getAttribute("investigation_list");
 session.removeAttribute("investigation_list");
@@ -22,10 +23,13 @@ List<Location> location_list = (List<Location>) session.getAttribute("location_l
 session.removeAttribute("location_list");
 List<UserRole> userRole =(List<UserRole>)session.getAttribute("userRole");
 session.removeAttribute("userRole");
+List<String> case_status = (List<String>) session.getAttribute("case_status");
+session.removeAttribute("case_status");
 boolean allow_edit = user_permission.contains("messages/add");
 boolean allow_assign = user_permission.contains("messages/assign");
 boolean allow_reopen = user_permission.contains("messages/reopen");
 boolean allow_closure = user_permission.contains("messages/close");
+boolean allow_substatus = user_permission.contains("messages/caseSubStatus");
 %>
 <style type="text/css">
 .placeImg { display:none !important;}
@@ -40,8 +44,8 @@ boolean allow_closure = user_permission.contains("messages/close");
     <div class="portlet box">
       <div class="portlet-title">
         <div class="caption">
-          <i class="icon-user font-green-sharp"></i>
-          <span class="caption-subject font-green-sharp sbold">Add Case</span>
+          <i class="icon-envelope-letter"></i>
+          <span class="caption-subject font-green-sharp sbold">Edit Case</span>
         </div>
         <div class="actions">
             <div class="btn-group">
@@ -299,61 +303,81 @@ boolean allow_closure = user_permission.contains("messages/close");
                 <div class="form-group">
                   <label class="col-md-4 control-label">Case Docs</label>
                   <div class="col-md-8 col-nopadding-l">
-                    <div class="col-md-3">
-                      <a href="javascript:void(0);">
-                        <div class="uploadFileDiv">
-                          <span data-imgID="imgMsgEnLbl_1" data-ID="imgMsgEn_1" id="enLblDelBtn_1" class="delete_btn" data-linkID="link_msgImgEn_1" data-toggle="tooltip" data-toggle="tooltip" title="Remove">
-                            <i class="fa fa-remove"></i>
-                          </span>
-                          <img src="${pageContext.request.contextPath}/resources/uploads/default_img.png" class="imgMsgEnLbl" id="imgMsgEnLbl_1" style="height:height:120px;width: 100%;" data-src="#" data-toggle="tooltip" data-toggle="tooltip" title="Click to upload Image 1" />
-                        </div>
-                        <input type="file" onchange="displayUploadImg(this, 'imgMsgEnLbl_1', 'enLblDelBtn_1', 'link_msgImgEn_1');" name="imgMsgEn_1" id="imgMsgEn_1" class="placeImg" accept="image/*" />
-                       </a>
-                    </div>
-                    <div class="col-md-3">
-                      <a href="javascript:void(0);">
-                        <div class="uploadFileDiv">
-                          <span data-imgID="imgMsgEnLbl_2" data-ID="imgMsgEn_2" id="enLblDelBtn_2" class="delete_btn" data-linkID="link_msgImgEn_2" data-toggle="tooltip" data-toggle="tooltip" title="Remove">
-                            <i class="fa fa-remove"></i>
-                          </span>
-                          <img src="${pageContext.request.contextPath}/resources/uploads/default_img.png" class="imgMsgEnLbl" id="imgMsgEnLbl_2" style="height:height:120px;width: 100%;" data-src="#" data-toggle="tooltip" data-toggle="tooltip" title="Click to upload Image 2" />
-                        </div>
-                        <input type="file" onchange="displayUploadImg(this, 'imgMsgEnLbl_2', 'enLblDelBtn_2', 'link_msgImgEn_2');" name="imgMsgEn_2" id="imgMsgEn_2" class="placeImg" accept="image/*" />
-                      </a>
-                    </div>
+                    <div class="col-md-4 text-center">
+	                  <a href="javascript:void(0);">
+	                    <img 
+	                    	<%if(case_detail.getPdf1FilePath().equals("")) {%> 
+	                    		src="${pageContext.request.contextPath}/resources/img/upload_img.png"
+	                    	<%} else {%>
+	                    		src="${pageContext.request.contextPath}/resources/img/pdf.png"
+	                    	<%} %>	
+	                    	id="img_userpdf" style="height:120px;" data-src="#" title = "Click here to upload PDF"> <br />
+	                        <%if(!case_detail.getPdf1FilePath().equals("")) {%>
+	                       		<a href = "<%=Config.upload_url + case_detail.getPdf1FilePath() %>" 
+		                    		target="_blank"><i class = "fa fa-download"></i> Download</a>
+                   			<%} %>
+                   		<input type='file' id="input_userpdf" style = "display:none" accept = "application/pdf">
+                  	  	</a>
+                  <input type="hidden" id="userpdf" name="userpdf">
+                </div>
+                
+                  <div class="col-md-4 text-center">
+	                  <a href="javascript:void(0);">
+	                    <img
+	                    	<%if(case_detail.getPdf2FilePath().equals("")) {%> 
+	                    		src="${pageContext.request.contextPath}/resources/img/upload_img.png"
+	                    	<%} else {%>
+	                    		src="${pageContext.request.contextPath}/resources/img/pdf.png"
+	                    	<%} %> 
+	                    	id="img_userpdf2" style="height:120px;" data-src="#" title = "Click here to upload PDF"> <br />
+	                    <input type='file' id="input_userpdf2" style = "display:none" accept = "application/pdf">
+	                    <%if(!case_detail.getPdf2FilePath().equals("")) {%>
+	                        <a href = "<%=Config.upload_url + case_detail.getPdf2FilePath() %>" 
+	                    		target="_blank"><i class = "fa fa-download"></i> Download</a>
+	                  		</a>
+                  		<%} %>
+                     <input type="hidden" id="userpdf2" name="userpdf2">
+                  </div>
                     
-                    <div class="col-md-3">
-                      <a href="javascript:void(0);">
-                        <div class="uploadFileDiv">
-                          <span data-imgID="imgMsgEnLbl_3" data-ID="imgMsgEn_3" id="enLblDelBtn_3" class="delete_btn" data-linkID="link_msgImgEn_3" data-toggle="tooltip" data-toggle="tooltip" title="Remove">
-                            <i class="fa fa-remove"></i>
-                          </span>
-                          <img src="${pageContext.request.contextPath}/resources/uploads/default_img.png" class="imgMsgEnLbl" id="imgMsgEnLbl_3" style="height:height:120px;width: 100%;" data-src="#" data-toggle="tooltip" data-toggle="tooltip" title="Click to upload Image 3" />
-                        </div>
-                        <input type="file" onchange="displayUploadImg(this, 'imgMsgEnLbl_3', 'enLblDelBtn_3', 'link_msgImgEn_3');" name="imgMsgEn_3" id="imgMsgEn_3" class="placeImg" accept="image/*" />
-                       </a>
-                    </div>
-                    
-                    <div class="col-md-3">
-                      <a href="javascript:void(0);">
-                        <div class="uploadFileDiv">
-                          <span data-imgID="imgMsgEnLbl_4" data-ID="imgMsgEn_4" id="enLblDelBtn_4" class="delete_btn" data-linkID="link_msgImgEn_4" data-toggle="tooltip" data-toggle="tooltip" title="Remove">
-                            <i class="fa fa-remove"></i>
-                          </span>
-                          <img src="${pageContext.request.contextPath}/resources/uploads/default_img.png" class="imgMsgEnLbl" id="imgMsgEnLbl_4" style="height:height:120px;width: 100%;" data-src="#" data-toggle="tooltip" data-toggle="tooltip" title="Click to upload Image 4" />
-                        </div>
-                        <input type="file" onchange="displayUploadImg(this, 'imgMsgEnLbl_4', 'enLblDelBtn_4', 'link_msgImgEn_4');" name="imgMsgEn_4" id="imgMsgEn_4" class="placeImg" accept="image/*" />
-                        </a>
-                    </div>  
+                  <div class="col-md-4  text-center">
+	                  <a href="javascript:void(0);">
+	                    <img 
+	                    	<%if(case_detail.getPdf3FilePath().equals("")) {%> 
+	                    		src="${pageContext.request.contextPath}/resources/img/upload_img.png"
+	                    	<%} else {%>
+	                    		src="${pageContext.request.contextPath}/resources/img/pdf.png"
+	                    	<%} %>	
+	                    	id="img_userpdf3" style="height:120px;" data-src="#" title = "Click here to upload PDF"> <br />
+	                    <input type='file' id="input_userpdf3" style = "display:none" accept = "application/pdf">
+	                    <%if(!case_detail.getPdf3FilePath().equals("")) {%>
+	                        <a href = "<%=Config.upload_url + case_detail.getPdf3FilePath() %>" 
+	                    		target="_blank"><i class = "fa fa-download"></i> Download</a>
+	                  		</a>
+	                  	<%} %>
+                   <input type="hidden" id="userpdf3" name="userpdf3">
+                 </div>  
               	</div>
               </div>
               
               <%if(!case_detail.getImageFilePath().equals("")) {%>
 	              <div class="form-group">
 	       		  	<label class="col-md-4 control-label">Image</label>
-	           		<div class="col-md-8">
-	                	<img src = "<%= Config.upload_url + case_detail.getImageFilePath() %>">
+	           		<div class="col-md-4">
+	                	<a href="<%= Config.upload_url + case_detail.getImageFilePath() %>" 
+	                		target = "_blank">
+	                		<img src = "<%= Config.upload_url + case_detail.getImageFilePath() %>" 
+	                			height="170px" width="auto">
+	              		</a>
 	              	</div>
+	              	<label class="col-md-1 control-label">Signature</label>
+	           		<div class="col-md-3">
+	                	<a href="<%= Config.upload_url + case_detail.getSignatureFilePath() %>" 
+	                		target = "_blank">
+	                		<img src = "<%= Config.upload_url + case_detail.getSignatureFilePath() %>" 
+	                			height="170px" width="auto">
+               			</a>
+	              	</div>
+	              	
 	              </div>                    
               <%} %>
 	              
@@ -444,7 +468,7 @@ boolean allow_closure = user_permission.contains("messages/close");
 	                <div class="col-md-2">
 	                  <select name="toStatus" id="toStatus" class="form-control" 
 	                  	tabindex="-1">
-	                    <option value="-1" disabled>Select</option>
+	                    <option value="-1" >Select</option>
 	                    <option value = "Approved">Approved</option>
 	                    <%if(allow_reopen) {%>
 	                    <option value = "Reopen">Reopen</option>
@@ -461,9 +485,12 @@ boolean allow_closure = user_permission.contains("messages/close");
 		                <div class="col-md-2">
 		                  <select name="caseSubStatus" id="caseSubStatus" class="form-control">
 		                  	<option value = '-1' selected disabled>Select</option>             	
-		                  	<option value = "Clean">Clean</option>
-		                  	<option value = "Not-Clean">Not-Clean</option>
-		                  	<option value = "PIV Stoppped">PIV Stoppped</option>
+		                  	<%if(case_status != null) {
+		                  		for(String item : case_status)
+		                  		{
+		                  	%>
+		                  		<option value = "<%=item %>"><%=item %></option>
+		                  	<%}} %>
 		                  </select>
 		            	</div>
 	            	</div>
@@ -473,14 +500,7 @@ boolean allow_closure = user_permission.contains("messages/close");
 		                	<span class="text-danger">*</span></label>
 		                <div class="col-md-2">
 		                  <select name="NotCleanCategory" id="NotCleanCategory" class="form-control">
-		                  	<option value = '-1' selected disabled>Select</option>		                  	
-		                  	<option value = 'Death Prior Application'> Death Prior Application</option>
-		                  	<option value = 'Medical Non-Disclosure'> Medical Non-Disclosure</option>
-		                  	<option value = 'Address not traceable'>Address not traceable</option>
-		                  	<option value = 'Mis-statement of Age'>Mis-statement of Age</option>
-		                  	<option value = 'Mis-statement of Income / Occupation'>Mis-statement of Income / Occupation</option>
-		                  	<option value = 'Personal Habit non-disclosure'>Personal Habit non-disclosure</option>
-		                  	<option value = 'Others'>Others</option> 
+		                  	<option value = '-1' selected disabled>Select</option>		                  	 
 		                  </select>
 		            	</div>
 	            	</div>
@@ -529,6 +549,48 @@ boolean allow_closure = user_permission.contains("messages/close");
 </div>
 <script>
 $("document").ready(function(){
+	
+	// for pdf
+	
+	var filename ="";
+	$("#img_userpdf").on('click', function() {                                      //pdf1
+	    $("#input_userpdf").trigger('click');
+	  });
+
+	$("#input_userpdf").change(function(e){ 
+		filename = $("#caseId").val() + "_" +e.target.files[0].name;
+		$("#userpdf").val(filename); 
+		console.log($("#userpdf").val());
+		uploadFiles(filename);
+	  });
+	
+	var filename2 ="";                                                             //pdf2
+	$("#img_userpdf2").on('click', function() {
+	    $("#input_userpdf2").trigger('click');
+	  });
+
+	$("#input_userpdf2").change(function(e){ 
+		filename2 = $("#caseId").val() + "_" +e.target.files[0].name;
+		$("#userpdf2").val(filename2); 
+		console.log($("#userpdf2").val());
+		uploadFiles(filename2);
+	  });
+	
+	var filename3 ="";                                                             //pdf3
+	$("#img_userpdf3").on('click', function() {
+	    $("#input_userpdf3").trigger('click');
+	  });
+
+	$("#input_userpdf3").change(function(e){ 
+		filename3 = $("#caseId").val() + "_" +e.target.files[0].name;
+		$("#userpdf3").val(filename3); 
+		console.log($("#userpdf3").val());
+		uploadFiles(filename3);
+	  });
+	
+	
+	
+                                                                                   //div hide 
 	$("#Not-CleanCategory").hide();
 	$("#case-SubStatus").hide();
 	
@@ -541,13 +603,20 @@ $("document").ready(function(){
 	$("#claimantCity").trigger("change");
 	
 	$("#toStatus").change(function(){
+		console.log("value"+$(this).val())
 		if($(this).val() == "Closed")
 		{
 			$("#case-closure").hide();
 			$("#case-SubStatus").show();
 		}
+		else if($(this).val() == "Approved" && <%= allow_substatus%>)
+		{
+			
+			$("#case-SubStatus").show();
+		}
 		else
 		{
+			
 			$("#case-closure").show();
 			$("#case-SubStatus").hide();
 			$("#Not-CleanCategory").hide();
@@ -556,397 +625,460 @@ $("document").ready(function(){
 	});
 
 	$("#caseSubStatus").change(function(){
-		if($(this).val() == "Not-Clean")
-		{
-			$("#Not-CleanCategory").show();
-		}
-		else
-		{
-			$("#Not-CleanCategory").hide();
-		}
-		
+		var caseSubStatus = $(this).val();
+		var optionSelect = "";
+		$("#NotCleanCategory option").each(function(){
+			if($(this).val() != '-1')
+				$(this).remove();
+		});
+		$.ajax({
+			type:"POST",
+			url :"${pageContext.request.contextPath}/message/getCaseCategory",
+			data:{"caseSubStatus":caseSubStatus},
+			success:function(data)
+			{
+				console.log(data);
+				for(i = 0; i< data.length ; i++)
+				{
+					optionSelect += "<option value = '" + data[i] + "'>" + data[i] + "</option> ";
+				}
+				if(optionSelect == "")
+				{
+					$("#Not-CleanCategory").hide();
+				}
+				else
+				{
+					$("#NotCleanCategory").append(optionSelect);
+					$("#Not-CleanCategory").show();
+				}
+			}
+		});
 	});
 	
-});
-</script>
+	
+	
+	function uploadFiles(prefix) {
+	    var formData = new FormData();
+		var files = $("input[type = 'file']");
+		$(files).each(function (i,value) {
+	         		formData.append('file[]', value.files[i]);
+	    });
+	    if(prefix != undefined)
+			formData.append("prefix",prefix);
+	    $.ajax({
+	        type: "POST",
+	        url: '${pageContext.request.contextPath}/uploadFile',
+	        data: formData,
+	        contentType: false, //used for multipart/form-data
+	        processData: false, //doesn't modify or encode the String
+	        cache: false, 
+	        async: false,//wait till the execution finishes
+	        success:function(result)
+	        {
+				if(result == "****")
+					toastr.success("File uploaded successfully","Success");
+	        }
+	    });
+	    return false;
+	}
+	
+	
+	$("#assignmessagesubmit").click(function()
+			{
+				//Validation for Case Closure
+				var caseId = $( '#edit_message_form #caseId' ).val();
+				var toStatus = $( '#edit_message_form #toStatus' ).val();
+			    var toRemarks = $( '#edit_message_form #toRemarks').val().trim();
+			    var caseSubStatus = $( '#edit_message_form #caseSubStatus').val();
+			    var NotCleanCategory = $( '#edit_message_form #NotCleanCategory').val(); 
+			    
+			    var toId = "";
+			    var toRole = "";
+			    var validFlag = 1;
+			    
+			    if(toStatus == null)
+			   	{
+			   		toastr.error("Kindly select status", "Error");
+			   		validFlag = 0;
+			   	}
+			    
+			    
+			    if(toStatus != "Closed")
+			   	{
+				    toId = $( '#edit_message_form #toId' ).val();
+				    toRole = $( '#edit_message_form #toRole' ).val();
+			   	
+				    if(toId == null)
+				   	{
+				   		toastr.error("Kindly select user", "Error");
+				   		validFlag = 0;
+				   	}
+				    
+				    if(toRole == null)
+				   	{
+				   		toastr.error("Kindly select User Role", "Error");
+				   		validFlag = 0;
+				   	}
+			   	}
+			    else if(toStatus == "Closed")
+			    {	
+			   		toId = $( '#edit_message_form #toId' ).val();
+				    toRole = $( '#edit_message_form #toRole' ).val();
+				    
+				    if(caseSubStatus == null)
+				   	{
+				   		toastr.error("Kindly select Case Sub-status", "Error");
+				   		validFlag = 0;
+				   		   		
+				   	}
+				    else if(caseSubStatus == 'Not-Clean' && NotCleanCategory == null)
+					{
+				   		toastr.error("Kindly select Not-clean category", "Error");
+				   		validFlag = 0;	   		
+					}
+			   	}
+			    
+			    if(toStatus == "Rejected" && toRemarks == "")
+			   	{
+			   		toastr.error("Kindly enter Rejection reason");
+			   		validFlag = 0;
+			   	}
+			    
+			    
+			    if(validFlag == 0)
+			   	{
+					return false;    	
+			   	}
+			    
+			    $("#assignmessagesubmit").html('<img src="${pageContext.request.contextPath}/resources/img/input-spinner.gif"> Loading...');
+			    $("#assignmessagesubmit").prop('disabled', true);
+			    $('#assignmessagesubmit').css("opacity",".5");
+			    
+			    
+			    $.ajax({
+				    type: "POST",
+				    url: 'assignCase',
+				    data:{
+				    	"toId"            : toId, 
+				    	"toRole"          : toRole, 
+				    	"toStatus"        : toStatus, 
+				    	"toRemarks"       : toRemarks, 
+				    	"caseId"          : caseId,
+				    	"caseSubStatus"   : caseSubStatus,
+				    	"NotCleanCategory": NotCleanCategory,
+				    	 "filename"      : filename,
+				    	 "filename2"      : filename2,
+				    	 "filename3"      : filename3
+				    	 },
+				    success:function(message)
+				    {
+				    	$("#editmessagesubmit").html('Assign Case');
+				        $("#editmessagesubmit").prop('disabled', false);
+				        $('#editmessagesubmit').css("opacity","");
+				        
+				    	if(message == "****")
+				    		{
+					    		toastr.success("Case assigned successfully", "Success");
+					    		location.href = "${pageContext.request.contextPath}/message/pending_message";
+					    		return;
+				    		}
+				    	else
+				    		{
+				    			toastr.error(message,"Error");
+			    				return;
+				    		}
+				    }
+			    });
+				
+			});
+	
+	 $("#editmessagesubmit").click(function(){
+		    
+			var policyNumber   = $( '#edit_message_form #policyNumber' ).val();
+		    var msgCategory    = $( '#edit_message_form #msgCategory' ).val();
+		    var insuredName    = $( '#edit_message_form #insuredName' ).val();
+		    var insuredDOD     = $( '#edit_message_form #insuredDOD' ).val();
+		    var insuredDOB     = $( '#edit_message_form #insuredDOB' ).val();
+		    var sumAssured     = $( '#edit_message_form #sumAssured' ).val();
+		    var msgIntimationType  = $( '#edit_message_form #msgIntimationType' ).val();    
+		    var locationId     = $( '#edit_message_form #claimantCity' ).val();
+		    var claimantZone   = $( '#edit_message_form #claimantZone' ).val();
+		    var claimantState  = $( '#edit_message_form #claimantState' ).val();
+		    var subStatus      = $( '#edit_message_form #subStatus' ).val();
+		    var nomineeName    = $( '#edit_message_form #nomineeName' ).val();
+		    var nomineeMob     = $( '#edit_message_form #nomineeMob' ).val();
+		    var nomineeAdd     = $( '#edit_message_form #nomineeAdd' ).val();
+		    var insuredAdd     = $( '#edit_message_form #insuredAdd' ).val();
+		    var caseId         = $( '#edit_message_form #caseId' ).val();
+		    var toId           = $( '#edit_message_form #toId' ).val();
+		    var toRole         = $( '#edit_message_form #toRole' ).val();
+		    var toStatus       = $( '#edit_message_form #toStatus' ).val();
+		    var toRemarks      = $( '#edit_message_form #toRemarks' ).val();
+		    var caseSubstatus  = "";
+		    var NotCleanCategory = ""; 
+		    
+		    var currentDate        = new Date();
+		    var insuredDateOfBirth = new Date(insuredDOB);
+		    var insuredDateOfDeath = new Date(insuredDOD);
+		    
+		    $('#policyNumber').removeClass('has-error-2');
+		    $("#msgCategory").removeClass('has-error-2');
+		    $("#insuredName").removeClass('has-error-2');
+		    $("#insuredDOD").removeClass('has-error-2');
+		    $("#insuredDOB").removeClass('has-error-2');
+		    $("#sumAssured").removeClass('has-error-2');
+		    $("#msgIntimationType").removeClass('has-error-2');
+		    $("#claimantCity").removeClass('has-error-2');
+		    $("#claimantZone").removeClass('has-error-2');
+		    $("#claimantState").removeClass('has-error-2');
+		    $("#nomineeName").removeClass('has-error-2');
+		    $("#nomineeAdd").removeClass('has-error-2');
+		    $("#insuredAdd").removeClass('has-error-2');
+		    $("#toRole").removeClass('has-error-2');
+		    $("#toId").removeClass('has-error-2');
+		    $("#caseSubstatus").removeClass('has-error-2');
+		    
+		    var errorFlag = 0;
+		   
+		    if(toStatus != "Closed")
+		    {   
+		    	caseSubstatus = "";
+		    	NotCleanCategory = "";
+			    if(toId == null)
+			    {
+			        toastr.error('Please select User','Error');
+			        $("#toId").addClass('has-error-2');
+			        $("#toId").focus();
+			        errorFlag = 1;
+			    }
+			    if(toRole == null)
+			    {
+			        toastr.error('Role Name cannot be empty','Error');
+			        $("#toRole").addClass('has-error-2');
+			        $("#toRole").focus();
+			        errorFlag = 1;
+			    }
+			    
+		    }
+		    else if(toStatus == "Closed")
+		   	{
+		    	toRole = "";
+		   		toId   = "";
+		   		caseSubstatus  = $( '#edit_message_form #caseSubstatus').val();
+		   	    NotCleanCategory = $( '#edit_message_form #NotCleanCategory').val(); 
+		   	    
+		   		if(caseSubStatus == null)
+			   	{
+			   		toastr.error("Kindly select Case Sub-status", "Error");
+			   		validFlag = 0;
+			   		   		
+			   	}
+			    else if(caseSubStatus == 'Not-Clean' && NotCleanCategory == null)
+				{
+			   		toastr.error("Kindly select Not-clean category", "Error");
+			   		validFlag = 0;	   		
+				}
+		   	}
+		    if(insuredAdd == '')
+		    {
+		        toastr.error('Please enter Insured Address','Error');
+		        $("#insuredAdd").addClass('has-error-2');
+		        $("#insuredAdd").focus();
+		        errorFlag = 1;
+		    }
+		    if(!(msgIntimationType == "PIV" || msgIntimationType == "PIRV" || msgIntimationType == "LIVE"))
+		   	{
+			    if(nomineeAdd == '')
+			    {
+			        toastr.error('Please enter Nominee Address','Error');
+			        $("#nomineeAdd").addClass('has-error-2');
+			        $("#nomineeAdd").focus();
+			        errorFlag = 1;
+			    }
+			    if(nomineeName == '')
+			    {
+			        toastr.error('Please enter Nominee Name','Error');
+			        $("#nomineeName").addClass('has-error-2');
+			        $("#nomineeName").focus();
+			        errorFlag = 1;
+			    }
+			    if(nomineeMob)
+			   	{
+			    	if(nomineeMob.length != 10)
+		    		{
+				    	$('#nomineeMob').addClass('has-error-2');
+				        $('#nomineeMob').focus();
+				        validflag = 0;
+				        toastr.error("Nominee Mobile number should be of 10 digits","Error");
+		    		}
+			   	}
+			    if(insuredDOD == '')
+			    {
+			      	toastr.error('Insured Date of Death cannot be empty','Error');
+			      	$("#insuredDOD").addClass('has-error-2');
+			      	$("#insuredDOD").focus();
+			      	errorFlag = 1;
+			    }
+		   	}
+		    if(claimantState == '')
+		    {
+		      toastr.error('Claimant State cannot be empty','Error');
+		      $("#claimantState").addClass('has-error-2');
+		      $("#claimantState").focus();
+		      errorFlag = 1;
+		    }
+		    if(claimantZone == '')
+		    {
+		      toastr.error('Claimaint Zone Cannot be empty','Error');
+		      $("#claimantZone").addClass('has-error-2');
+		      $("#claimantZone").focus();
+		      errorFlag = 1;
+		    }
+		    if(claimantCity == null)
+		    {
+				toastr.error('Claimant City cannot be empty','Error');
+				$("#claimantCity").addClass('has-error-2');
+				$("#claimantCity").focus();
+				errorFlag = 1;
+		    }
+		    if(msgIntimationType == '')
+		    {
+		        toastr.error('Please select Intimation Type','Error');
+		        $("#msgIntimationType").addClass('has-error-2');
+		        $("#msgIntimationType").focus();
+		        errorFlag = 1;
+		    }
+		    if(sumAssured == '')
+		    {
+		        toastr.error('Sum Assured cannot be empty','Error');
+		        $("#sumAssured").addClass('has-error-2');
+		        $("#sumAssured").focus();
+		        errorFlag = 1;
+		    }
+		    if(insuredDOB == '')
+		    {
+		      	toastr.error('Insured Date of Birth cannot be empty','Error');
+		      	$("#insuredDOB").addClass('has-error-2');
+		      	$("#insuredDOB").focus();
+		      	errorFlag = 1;
+		    }
+		    if(insuredName == '')
+		    {
+		      	toastr.error('Please enter Insured Name','Error');
+		      	$("#insuredName").addClass('has-error-2');
+		      	$("#insuredName").focus();
+		      	errorFlag = 1;
+		    }
+		    if(insuredDateOfBirth >= currentDate)
+		   	{
+		    	toastr.error("Insured Date of Birth cannot be greater than equal to Today's Date",'Error');
+		      	$("#insuredDOB").addClass('has-error-2');
+		      	$("#insuredDOB").focus();
+		      	errorFlag = 1;
+		   	}
+		    if(insuredDOD != "")
+		   	{
+			   if(insuredDateOfBirth >= insuredDateOfDeath)
+			  	{
+			   		toastr.error('Insured DOB cannot be greater than equal to Insured DOD','Error');
+			     	$("#insuredDOD").addClass('has-error-2');
+			     	$("#insuredDOD").focus();
+			     	errorFlag = 1;
+			  	}
+			   if(insuredDateOfDeath > currentDate)
+			  	{
+			   		toastr.error("Insured DOD cannot be greater than Today's Date",'Error');
+			     	$("#insuredDOD").addClass('has-error-2');
+			     	$("#insuredDOD").focus();
+			     	errorFlag = 1;
+			  	}
+		   	}
+		    if(msgCategory == '')
+		    {
+		        toastr.error('Investigation Category cannot be empty','Error');
+		        $("#msgCategory").addClass('has-error-2');
+		        $("#msgCategory").focus();
+		        errorFlag = 1;
+		    }
+		    if(policyNumber == '')
+		    {
+		    	toastr.error('Policy Number cannot be empty','Error');
+		    	$('#policyNumber').addClass('has-error-2');
+		    	$('#policyNumber').focus();
+		    	errorFlag = 1;
+		    }
+		    
+		    if(errorFlag == 1)
+		    	return false;
+		        
+		    $("#editmessagesubmit").html('<img src="${pageContext.request.contextPath}/resources/img/input-spinner.gif"> Loading...');
+		    $("#editmessagesubmit").prop('disabled', true);
+		    $('#editmessagesubmit').css("opacity",".5");
 
-<script>
-$("#assignmessagesubmit").click(function()
-{
-	//Validation for Case Closure
-	var caseId = $( '#edit_message_form #caseId' ).val();
-	var toStatus = $( '#edit_message_form #toStatus' ).val();
-    var toRemarks = $( '#edit_message_form #toRemarks').val().trim();
-    var caseSubStatus = $( '#edit_message_form #caseSubStatus').val();
-    var NotCleanCategory = $( '#edit_message_form #NotCleanCategory').val(); 
-    
-    var toId = "";
-    var toRole = "";
-    var validFlag = 1;
-    
-    if(toStatus == null)
-   	{
-   		toastr.error("Kindly select status", "Error");
-   		validFlag = 0;
-   	}
-    
-    
-    if(toStatus != "Closed")
-   	{
-	    toId = $( '#edit_message_form #toId' ).val();
-	    toRole = $( '#edit_message_form #toRole' ).val();
-   	
-	    if(toId == null)
-	   	{
-	   		toastr.error("Kindly select user", "Error");
-	   		validFlag = 0;
-	   	}
-	    
-	    if(toRole == null)
-	   	{
-	   		toastr.error("Kindly select User Role", "Error");
-	   		validFlag = 0;
-	   	}
-   	}
-    else if(toStatus == "Closed")
-    {	
-   		toId = $( '#edit_message_form #toId' ).val();
-	    toRole = $( '#edit_message_form #toRole' ).val();
-	    
-	    if(caseSubStatus == null)
-	   	{
-	   		toastr.error("Kindly select Case Sub-status", "Error");
-	   		validFlag = 0;
-	   		   		
-	   	}
-	    else if(caseSubStatus == 'Not-Clean' && NotCleanCategory == null)
-		{
-	   		toastr.error("Kindly select Not-clean category", "Error");
-	   		validFlag = 0;	   		
-		}
-   	}
-    
-    if(toStatus == "Rejected" && toRemarks == "")
-   	{
-   		toastr.error("Kindly enter Rejection reason");
-   		validFlag = 0;
-   	}
-    
-    
-    if(validFlag == 0)
-   	{
-		return false;    	
-   	}
-    
-    $("#assignmessagesubmit").html('<img src="${pageContext.request.contextPath}/resources/img/input-spinner.gif"> Loading...');
-    $("#assignmessagesubmit").prop('disabled', true);
-    $('#assignmessagesubmit').css("opacity",".5");
-    
-    
-    $.ajax({
-	    type: "POST",
-	    url: 'assignCase',
-	    data:{
-	    	"toId"            : toId, 
-	    	"toRole"          : toRole, 
-	    	"toStatus"        : toStatus, 
-	    	"toRemarks"       : toRemarks, 
-	    	"caseId"          : caseId,
-	    	"caseSubStatus"   : caseSubStatus,
-	    	"NotCleanCategory": NotCleanCategory},
-	    success:function(message)
-	    {
-	    	$("#editmessagesubmit").html('Assign Case');
-	        $("#editmessagesubmit").prop('disabled', false);
-	        $('#editmessagesubmit').css("opacity","");
-	        
-	    	if(message == "****")
-	    		{
-		    		toastr.success("Case assigned successfully", "Success");
-		    		location.href = "${pageContext.request.contextPath}/message/pending_message";
-		    		return;
-	    		}
-	    	else
-	    		{
-	    			toastr.error(message,"Error");
-    				return;
-	    		}
-	    }
-    });
+		    
+		    var formdata = {
+		    		'policyNumber'     : policyNumber,
+		   	    	'msgCategory'      : msgCategory,
+		   	       	'insuredDOD'       : insuredDOD,
+		   	      	'insuredDOB'       : insuredDOB,
+		   	      	'insuredName'      : insuredName,
+		          	'sumAssured'       : sumAssured,
+		          	'msgIntimationType': msgIntimationType,
+		          	'locationId'       : locationId,
+			       	'nomineeName'      : nomineeName,
+			       	'nomineeMob'       : nomineeMob,
+			       	'nomineeAdd'       : nomineeAdd,
+			       	'insuredAdd'       : insuredAdd,
+			       	'toRole'           : toRole,
+			       	'toStatus'         : toStatus,
+		        	'toRemarks'        : toRemarks,
+		        	'caseId'           : caseId,
+		        	'caseSubStatus'    : caseSubstatus,
+		        	'NotCleanCategory' : NotCleanCategory,
+		        	"toId"             : toId,
+		        	"filename"      : filename,
+			    	"filename2"      : filename2,
+			    	"filename3"      : filename3
+		        	};
+		    console.log(formdata);
+		    
+		    $.ajax({
+			    type: "POST",
+			    url: 'updateMessageDetails',
+			    data: formdata,
+
+			    success: function( data )
+			    {
+			        $("#editmessagesubmit").html('Update Case');
+			        $("#editmessagesubmit").prop('disabled',false );
+			        $('#editmessagesubmit').css("opacity","");
+			  	  if(data == "****")
+			  	  {
+			         location.href = "${pageContext.request.contextPath}/message/pending_message";
+			  	  }
+			  	  else
+			         toastr.error( data,'Error' );
+			    } 
+			    
+			  });
+		  });
+
+	
+	
 	
 });
+
+
+</script>
+
+
+<script>
 
 
 </script>
 
 <script type="text/javascript">
-  $("#editmessagesubmit").click(function(){
-    
-	var policyNumber   = $( '#edit_message_form #policyNumber' ).val();
-    var msgCategory    = $( '#edit_message_form #msgCategory' ).val();
-    var insuredName    = $( '#edit_message_form #insuredName' ).val();
-    var insuredDOD     = $( '#edit_message_form #insuredDOD' ).val();
-    var insuredDOB     = $( '#edit_message_form #insuredDOB' ).val();
-    var sumAssured     = $( '#edit_message_form #sumAssured' ).val();
-    var msgIntimationType  = $( '#edit_message_form #msgIntimationType' ).val();    
-    var locationId     = $( '#edit_message_form #claimantCity' ).val();
-    var claimantZone   = $( '#edit_message_form #claimantZone' ).val();
-    var claimantState  = $( '#edit_message_form #claimantState' ).val();
-    var subStatus      = $( '#edit_message_form #subStatus' ).val();
-    var nomineeName    = $( '#edit_message_form #nomineeName' ).val();
-    var nomineeMob     = $( '#edit_message_form #nomineeMob' ).val();
-    var nomineeAdd     = $( '#edit_message_form #nomineeAdd' ).val();
-    var insuredAdd     = $( '#edit_message_form #insuredAdd' ).val();
-    var caseId         = $( '#edit_message_form #caseId' ).val();
-    var toId           = $( '#edit_message_form #toId' ).val();
-    var toRole         = $( '#edit_message_form #toRole' ).val();
-    var toStatus       = $( '#edit_message_form #toStatus' ).val();
-    var toRemarks      = $( '#edit_message_form #toRemarks' ).val();
-    var caseSubstatus  = "";
-    var NotCleanCategory = ""; 
-    
-    var currentDate        = new Date();
-    var insuredDateOfBirth = new Date(insuredDOB);
-    var insuredDateOfDeath = new Date(insuredDOD);
-    
-    $('#policyNumber').removeClass('has-error-2');
-    $("#msgCategory").removeClass('has-error-2');
-    $("#insuredName").removeClass('has-error-2');
-    $("#insuredDOD").removeClass('has-error-2');
-    $("#insuredDOB").removeClass('has-error-2');
-    $("#sumAssured").removeClass('has-error-2');
-    $("#msgIntimationType").removeClass('has-error-2');
-    $("#claimantCity").removeClass('has-error-2');
-    $("#claimantZone").removeClass('has-error-2');
-    $("#claimantState").removeClass('has-error-2');
-    $("#nomineeName").removeClass('has-error-2');
-    $("#nomineeAdd").removeClass('has-error-2');
-    $("#insuredAdd").removeClass('has-error-2');
-    $("#toRole").removeClass('has-error-2');
-    $("#toId").removeClass('has-error-2');
-    $("#caseSubstatus").removeClass('has-error-2');
-    
-    var errorFlag = 0;
-   
-    if(toStatus != "Closed")
-    {   
-    	caseSubstatus = "";
-    	NotCleanCategory = "";
-	    if(toId == null)
-	    {
-	        toastr.error('Please select User','Error');
-	        $("#toId").addClass('has-error-2');
-	        $("#toId").focus();
-	        errorFlag = 1;
-	    }
-	    if(toRole == null)
-	    {
-	        toastr.error('Role Name cannot be empty','Error');
-	        $("#toRole").addClass('has-error-2');
-	        $("#toRole").focus();
-	        errorFlag = 1;
-	    }
-	    
-    }
-    else if(toStatus == "Closed")
-   	{
-    	toRole = "";
-   		toId   = "";
-   		caseSubstatus  = $( '#edit_message_form #caseSubstatus').val();
-   	    NotCleanCategory = $( '#edit_message_form #NotCleanCategory').val(); 
-   	    
-   		if(caseSubStatus == null)
-	   	{
-	   		toastr.error("Kindly select Case Sub-status", "Error");
-	   		validFlag = 0;
-	   		   		
-	   	}
-	    else if(caseSubStatus == 'Not-Clean' && NotCleanCategory == null)
-		{
-	   		toastr.error("Kindly select Not-clean category", "Error");
-	   		validFlag = 0;	   		
-		}
-   	}
-    if(insuredAdd == '')
-    {
-        toastr.error('Please enter Insured Address','Error');
-        $("#insuredAdd").addClass('has-error-2');
-        $("#insuredAdd").focus();
-        errorFlag = 1;
-    }
-    if(!(msgIntimationType == "PIV" || msgIntimationType == "PIRV" || msgIntimationType == "LIVE"))
-   	{
-	    if(nomineeAdd == '')
-	    {
-	        toastr.error('Please enter Nominee Address','Error');
-	        $("#nomineeAdd").addClass('has-error-2');
-	        $("#nomineeAdd").focus();
-	        errorFlag = 1;
-	    }
-	    if(nomineeName == '')
-	    {
-	        toastr.error('Please enter Nominee Name','Error');
-	        $("#nomineeName").addClass('has-error-2');
-	        $("#nomineeName").focus();
-	        errorFlag = 1;
-	    }
-	    if(nomineeMob)
-	   	{
-	    	if(nomineeMob.length != 10)
-    		{
-		    	$('#nomineeMob').addClass('has-error-2');
-		        $('#nomineeMob').focus();
-		        validflag = 0;
-		        toastr.error("Nominee Mobile number should be of 10 digits","Error");
-    		}
-	   	}
-	    if(insuredDOD == '')
-	    {
-	      	toastr.error('Insured Date of Death cannot be empty','Error');
-	      	$("#insuredDOD").addClass('has-error-2');
-	      	$("#insuredDOD").focus();
-	      	errorFlag = 1;
-	    }
-   	}
-    if(claimantState == '')
-    {
-      toastr.error('Claimant State cannot be empty','Error');
-      $("#claimantState").addClass('has-error-2');
-      $("#claimantState").focus();
-      errorFlag = 1;
-    }
-    if(claimantZone == '')
-    {
-      toastr.error('Claimaint Zone Cannot be empty','Error');
-      $("#claimantZone").addClass('has-error-2');
-      $("#claimantZone").focus();
-      errorFlag = 1;
-    }
-    if(claimantCity == null)
-    {
-		toastr.error('Claimant City cannot be empty','Error');
-		$("#claimantCity").addClass('has-error-2');
-		$("#claimantCity").focus();
-		errorFlag = 1;
-    }
-    if(msgIntimationType == '')
-    {
-        toastr.error('Please select Intimation Type','Error');
-        $("#msgIntimationType").addClass('has-error-2');
-        $("#msgIntimationType").focus();
-        errorFlag = 1;
-    }
-    if(sumAssured == '')
-    {
-        toastr.error('Sum Assured cannot be empty','Error');
-        $("#sumAssured").addClass('has-error-2');
-        $("#sumAssured").focus();
-        errorFlag = 1;
-    }
-    if(insuredDOB == '')
-    {
-      	toastr.error('Insured Date of Birth cannot be empty','Error');
-      	$("#insuredDOB").addClass('has-error-2');
-      	$("#insuredDOB").focus();
-      	errorFlag = 1;
-    }
-    if(insuredName == '')
-    {
-      	toastr.error('Please enter Insured Name','Error');
-      	$("#insuredName").addClass('has-error-2');
-      	$("#insuredName").focus();
-      	errorFlag = 1;
-    }
-    if(insuredDateOfBirth >= currentDate)
-   	{
-    	toastr.error("Insured Date of Birth cannot be greater than equal to Today's Date",'Error');
-      	$("#insuredDOB").addClass('has-error-2');
-      	$("#insuredDOB").focus();
-      	errorFlag = 1;
-   	}
-    if(insuredDOD != "")
-   	{
-	   if(insuredDateOfBirth >= insuredDateOfDeath)
-	  	{
-	   		toastr.error('Insured DOB cannot be greater than equal to Insured DOD','Error');
-	     	$("#insuredDOD").addClass('has-error-2');
-	     	$("#insuredDOD").focus();
-	     	errorFlag = 1;
-	  	}
-	   if(insuredDateOfDeath > currentDate)
-	  	{
-	   		toastr.error("Insured DOD cannot be greater than Today's Date",'Error');
-	     	$("#insuredDOD").addClass('has-error-2');
-	     	$("#insuredDOD").focus();
-	     	errorFlag = 1;
-	  	}
-   	}
-    if(msgCategory == '')
-    {
-        toastr.error('Investigation Category cannot be empty','Error');
-        $("#msgCategory").addClass('has-error-2');
-        $("#msgCategory").focus();
-        errorFlag = 1;
-    }
-    if(policyNumber == '')
-    {
-    	toastr.error('Policy Number cannot be empty','Error');
-    	$('#policyNumber').addClass('has-error-2');
-    	$('#policyNumber').focus();
-    	errorFlag = 1;
-    }
-    
-    if(errorFlag == 1)
-    	return false;
-        
-    $("#editmessagesubmit").html('<img src="${pageContext.request.contextPath}/resources/img/input-spinner.gif"> Loading...');
-    $("#editmessagesubmit").prop('disabled', true);
-    $('#editmessagesubmit').css("opacity",".5");
-
-    
-    var formdata = {
-    		'policyNumber'     : policyNumber,
-   	    	'msgCategory'      : msgCategory,
-   	       	'insuredDOD'       : insuredDOD,
-   	      	'insuredDOB'       : insuredDOB,
-   	      	'insuredName'      : insuredName,
-          	'sumAssured'       : sumAssured,
-          	'msgIntimationType': msgIntimationType,
-          	'locationId'       : locationId,
-	       	'nomineeName'      : nomineeName,
-	       	'nomineeMob'       : nomineeMob,
-	       	'nomineeAdd'       : nomineeAdd,
-	       	'insuredAdd'       : insuredAdd,
-	       	'toRole'           : toRole,
-	       	'toStatus'         : toStatus,
-        	'toRemarks'        : toRemarks,
-        	'caseId'           : caseId,
-        	'caseSubStatus'    : caseSubstatus,
-        	'NotCleanCategory' : NotCleanCategory,
-        	"toId"             : toId 
-        	};
-    console.log(formdata);
-    
-    $.ajax({
-	    type: "POST",
-	    url: 'updateMessageDetails',
-	    data: formdata,
-
-	    success: function( data )
-	    {
-	        $("#editmessagesubmit").html('Update Case');
-	        $("#editmessagesubmit").prop('disabled',false );
-	        $('#editmessagesubmit').css("opacity","");
-	  	  if(data == "****")
-	  	  {
-	         location.href = "${pageContext.request.contextPath}/message/pending_message";
-	  	  }
-	  	  else
-	         toastr.error( data,'Error' );
-	    } 
-	    
-	  });
-  });
+ 
 
 function clearForm(){
   $( '#small_modal' ).modal();
@@ -969,6 +1101,7 @@ $("#toRole").change(function(){
 		if($(this).val() != '-1')
 			$(this).remove();
 	});
+	$("#toId").prop("disabled",true);
 	$.ajax({
 	    type: "POST",
 	    url: 'getUserByRole',
@@ -983,6 +1116,7 @@ $("#toRole").change(function(){
 	  			}
 	  		console.log(options);
 	    	$("#toId").append(options);
+	    	$("#toId").prop("disabled",false);
 	    }
 });
 
@@ -1014,3 +1148,5 @@ $("#toStatus").change(function(){
 
 });
 </script>
+		                  		                  		
+		                  		

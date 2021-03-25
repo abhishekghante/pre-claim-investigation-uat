@@ -19,12 +19,50 @@ session.removeAttribute("intimation_list");
 <link href="${pageContext.request.contextPath}/resources/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <script src="${pageContext.request.contextPath}/resources/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/resources/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
+<style>
+@media(max-width:576px)
+{
+	table thead, table tfoot
+	{
+		display:none;
+	}
+
+	table, table tbody, table tr, table td
+	{
+		display : block;
+		width   : 100%;
+	}
+	
+	table td
+	{
+		width : 90%;
+		text-align: right;
+		position   : relative;
+		padding-left: 50%;
+	}
+	table tr
+	{
+		margin-bottom : 15px;
+	}
+	table td::before
+	{
+		 content: attr(data-label);
+		 position : absolute;
+		 left : 10px;
+		 width : 50%;
+		 text-align: left;
+	}
+
+}
+
+
+</style>
 <div class="row">
   <div class="col-xs-12 col-sm-12">
     <div class="portlet box">
       <div class="portlet-title">
         <div class="caption">
-            <i class="icon-users font-green-sharp"></i>
+            <i class="icon-plus"></i>
             <span class="caption-subject font-green-sharp sbold">Bill Payment Lists</span>
         </div>
        <%--  <%if(allow_add){ %> --%>
@@ -76,13 +114,13 @@ session.removeAttribute("intimation_list");
                           
                           <tr>
                   				<td><%=list_case.getSrNo()%></td>
-                  				<td><%=list_case.getCaseID()%></td>
-                  			   	<td><%=list_case.getPolicyNumber()%></td>
-                  				<td><%=list_case.getInvestigationType()%></td>
-                  				<td><%=list_case.getInitimationType()%></td>
-                                <td><%=list_case.getSupervisorID()%></td>
-                                <td><%=list_case.getSupervisorName()%></td>
-                                <td><%=list_case.getCharges()%></td>
+                  				<td data-label = "Case ID"><%=list_case.getCaseID()%></td>
+                  			   	<td data-label = "Policy Number"><%=list_case.getPolicyNumber()%></td>
+                  				<td data-label = "Investigation Type"><%=list_case.getInvestigationType()%></td>
+                  				<td data-label = "Intimation Type"><%=list_case.getInitimationType()%></td>
+                                <td data-label = "Supervisor ID"><%=list_case.getSupervisorID()%></td>
+                                <td data-label = "Supervisor Name"><%=list_case.getSupervisorName()%></td>
+                                <td data-label = "Fees"><%=list_case.getCharges()%></td>
                           </tr>                      
                        
                        <% 		

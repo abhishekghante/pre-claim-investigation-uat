@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.preclaim.config.CustomMethods;
+import com.preclaim.dao.CaseStatusDao;
 import com.preclaim.dao.LocationDao;
 import com.preclaim.dao.MailConfigDao;
 import com.preclaim.dao.UserDAO;
@@ -38,6 +39,9 @@ public class UserController {
 	
 	@Autowired
 	MailConfigDao mailConfigDao;
+	
+	@Autowired
+	CaseStatusDao caseStatusDao;
 	
 	@RequestMapping(value = "/add_user", method = RequestMethod.GET)
 	public String add_user(HttpSession session,Model m)
@@ -302,6 +306,7 @@ public class UserController {
 		user_details.setAddress1(request.getParameter("address1"));
 		user_details.setAddress2(request.getParameter("address2"));
 		user_details.setAddress3(request.getParameter("address3"));
+		user_details.setFees(Double.parseDouble(request.getParameter("fees")));
 		user_details.setContactNumber(request.getParameter("contactNumber"));
 		user_details.setUpdatedBy(user.getUsername());
 		String message = dao.updateUserDetails(user_details);
@@ -327,7 +332,8 @@ public class UserController {
     	List<String> role_permission = dao.retrievePermission(roleCode);
     	session.setAttribute("role_code", String.valueOf(roleCode));
     	session.setAttribute("permission", role_permission);
-        session.setAttribute("user role",dao.getUserRole(roleCode)); 
+        session.setAttribute("user role",dao.getUserRole(roleCode));
+        session.setAttribute("case_status", caseStatusDao.getActiveCaseStatus());
     	List<UserRole> role = dao.role_lists();
     	session.setAttribute("role_list", role);
     	return "common/templatecontent";

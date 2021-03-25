@@ -1,6 +1,7 @@
 <%@page import = "java.util.ArrayList" %>
 <%@page import="java.util.List" %>
 <%@page import="com.preclaim.models.UserRole" %>
+<%@page import="com.preclaim.models.CaseStatus" %>
 <%
 ArrayList<String> role_permission = new ArrayList<String>();
 role_permission = (ArrayList<String>) session.getAttribute("permission");
@@ -12,6 +13,8 @@ session.removeAttribute("user role");
 ArrayList<String> user_permission=(ArrayList<String>)session.getAttribute("user_permission");
 List<UserRole> user_role=(List<UserRole>)session.getAttribute("role_list");
 session.removeAttribute("role_list");
+List<CaseStatus> case_status = (List<CaseStatus>) session.getAttribute("case_status");
+session.removeAttribute("case_status");
 
 if(role_permission == null)
 	role_permission = new ArrayList<String>();
@@ -134,7 +137,31 @@ if(role_permission == null)
 			                    		<input type="checkbox" <%if(role_permission.contains("messages/assign")) {%>checked <%} %> name="messages[]" id="messages_assign" class="indPLCheck7" value="messages/assign"> <label for="messages_assign">Assign</label>
 			                    		<input type="checkbox" <%if(role_permission.contains("messages/reopen")) {%>checked <%} %> name="messages[]" id="messages_reopen" class="indPLCheck7" value="messages/reopen"> <label for="messages_reopen">Reopen</label>
 			                    		<input type="checkbox" <%if(role_permission.contains("messages/close")) {%>checked <%} %> name="messages[]" id="messages_close" class="indPLCheck7" value="messages/close"> <label for="messages_close">Case Closure</label>
-			                    		<input type="checkbox" <%if(role_permission.contains("messages/caseSubStatus")) {%>checked <%} %> name="messages[]" id="messages_caseSubStatus" class="indPLCheck7" value="messages/caseSubStatus"> <label for="messages_caseSubStatus">Case Sub-status</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("messages/caseSubStatus")) {%>checked <%} %> name="messages[]" id="messages_caseSubStatus" class="indPLCheck7" value="messages/caseSubStatus"> <label for="messages_caseSubStatus">Assign & Sub-status</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("messages/bulkAssign")) {%>checked <%} %> name="messages[]" id="messages_bulkAssign" class="indPLCheck7" value="messages/bulkAssign"> <label for="messages_bulkAssign">Bulk-Assign</label>
+			                    	
+			                    	</td>
+			                    </tr>
+			                    <tr>
+			                    	<td>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseStatus")) {%>checked <%} %> name="caseStatus[]" id="caseStatus" class="allPLCheckCS" value="caseStatus"> <label for="caseStatus">Case Status</label>
+			                    	</td>
+			                    	<td>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseStatus/index")) {%>checked <%} %>  name="caseStatus[]" id="caseStatus_index"  class="indPLCheckCS" value="caseStatus/index">  <label for="caseStatus_index">View</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseStatus/add"))   {%>checked <%} %>  name="caseStatus[]" id="caseStatus_add"    class="indPLCheckCS" value="caseStatus/add">    <label for="caseStatus_add">Add</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseStatus/delete")) {%>checked <%} %> name="caseStatus[]" id="caseStatus_delete" class="indPLCheckCS" value="caseStatus/delete"> <label for="caseStatus_delete">Delete</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseStatus/status")) {%>checked <%} %> name="caseStatus[]" id="caseStatus_status" class="indPLCheckCS" value="caseStatus/status"> <label for="caseStatus_status">Approve Status</label>
+			                    	</td>
+			                    </tr>
+			                    <tr>
+			                    	<td>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseCategory")) {%>checked <%} %> name="caseCategory[]" id="caseCategory" class="allPLCheckCC" value="caseCategory"> <label for="caseCategory">Case Category</label>
+			                    	</td>
+			                    	<td>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseCategory/index")) {%>checked <%} %>  name="caseCategory[]" id="caseCategory_index"  class="indPLCheckCC" value="caseCategory/index">  <label for="caseCategory_index">View</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseCategory/add"))   {%>checked <%} %>  name="caseCategory[]" id="caseCategory_add"    class="indPLCheckCC" value="caseCategory/add">    <label for="caseCategory_add">Add</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseCategory/delete")) {%>checked <%} %> name="caseCategory[]" id="caseCategory_delete" class="indPLCheckCC" value="caseCategory/delete"> <label for="caseCategory_delete">Delete</label>
+			                    		<input type="checkbox" <%if(role_permission.contains("caseCategory/status")) {%>checked <%} %> name="caseCategory[]" id="caseCategory_status" class="indPLCheckCC" value="caseCategory/status"> <label for="caseCategory_status">Approve Status</label>
 			                    	</td>
 			                    </tr>
 			                    <tr>
@@ -184,7 +211,7 @@ if(role_permission == null)
 			                    
 			                     <tr>
 			                    	<td>
-			                    	    <input type="checkbox" <%if(role_permission.contains("approve")) {%>checked <%} %> name="approve" id="approve" class="allPLCheck12" value="approve"> <label for="approve">Approve</label>
+			                    	    <input type="checkbox" <%if(role_permission.contains("approve")) {%>checked <%} %> name="approve" id="approve" class="allPLCheck12" value="approve"> <label for="approve">Assign</label>
 			                    	</td>
 			                    	<td>
 			                    	     <%if(user_role!=null){
@@ -209,7 +236,19 @@ if(role_permission == null)
 			                        </td>
 			                         		
 			                    </tr>
-			                    
+			                    <tr>
+			                    	<td>
+			                    	    <input type="checkbox" <%if(role_permission.contains("caseType")) {%>checked <%} %> name="caseType" id="caseType" class="allPLCheck14" value="caseType"> <label for="caseType">Case Type</label>
+			                    	</td>
+			                    	<td>
+			                    	     <%if(case_status !=null){
+			                    	          for(CaseStatus item : case_status){	
+			                    	     %>
+			                           <input type="checkbox" <%if(role_permission.contains(item.getCaseStatus())) {%>checked <%} %> name="caseType[]" id="caseType_<%=item.getCaseStatus() %>" class="indPLCheck14" value="<%=item.getCaseStatus()%>"> <label for="caseType_<%=item.getCaseStatus()%>"><%=item.getCaseStatus() %></label>	
+			                        	<%}}%>
+			                        </td>
+			                         		
+			                    </tr>
 		                	</tbody>
                         </table>
                       </div>
@@ -332,6 +371,13 @@ if(role_permission == null)
 			$( '.indPLCheck13' ).prop( 'checked', false );
 		}
 	});
+	$( '.allPLCheck14' ).on( 'click', function() {
+		if( $( this ).is( ':checked' ) ) {
+			$( '.indPLCheck14' ).prop( "checked", true );
+		} else {
+			$( '.indPLCheck14' ).prop( 'checked', false );
+		}
+	});
 	$( '.allPLCheckRM' ).on( 'click', function() {
 		if( $( this ).is( ':checked' ) ) {
 			$( '.indPLCheckRM' ).prop( "checked", true );
@@ -358,6 +404,20 @@ if(role_permission == null)
 			$( '.indPLCheckDashboard' ).prop( "checked", true );
 		} else {
 			$( '.indPLCheckDashboard' ).prop( 'checked', false );
+		}
+	});
+	$( '.allPLCheckCS' ).on( 'click', function() {
+		if( $( this ).is( ':checked' ) ) {
+			$( '.indPLCheckCS' ).prop( "checked", true );
+		} else {
+			$( '.indPLCheckCS' ).prop( 'checked', false );
+		}
+	});
+	$( '.allPLCheckCC' ).on( 'click', function() {
+		if( $( this ).is( ':checked' ) ) {
+			$( '.indPLCheckCC' ).prop( "checked", true );
+		} else {
+			$( '.indPLCheckCC' ).prop( 'checked', false );
 		}
 	});
    function addPermission() {

@@ -1,13 +1,13 @@
 <%@page import = "java.util.List"%>
-<%@page import = "com.preclaim.models.IntimationTypeList"%>
+<%@page import = "com.preclaim.models.CaseStatusList"%>
 <%
-List<IntimationTypeList> pending_list = (List<IntimationTypeList>) session.getAttribute("pending_intimationType");
-session.removeAttribute("pending_intimationType");
-IntimationTypeList intimationTypeList = (IntimationTypeList) session.getAttribute("intimationTypeList");
-session.removeAttribute("intimationTypeList");
-List<String> user_permission=(List<String>)session.getAttribute("user_permission");
-boolean allow_statusChg = user_permission.contains("intimationType/status");
-boolean allow_delete = user_permission.contains("intimationType/delete");
+List<CaseStatusList> pending_list = (List<CaseStatusList>) session.getAttribute("pending_caseStatus");
+session.removeAttribute("pending_caseStatus");
+CaseStatusList caseStatusList = (CaseStatusList) session.getAttribute("caseStatusList");
+session.removeAttribute("caseStatusList");
+List<String> user_permission = (List<String>)session.getAttribute("user_permission");
+boolean allow_statusChg = user_permission.contains("caseStatus/status");
+boolean allow_delete = user_permission.contains("caseStatus/delete");
 %>
 <link href="${pageContext.request.contextPath}/resources/global/plugins/datatables/datatables.min.css" rel="stylesheet" type="text/css" />
 <link href="${pageContext.request.contextPath}/resources/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
@@ -58,8 +58,8 @@ boolean allow_delete = user_permission.contains("intimationType/delete");
 				<div class="caption">
 					 <i class="icon-plus"></i>
 					<span class="caption-subject font-green-sharp sbold">
-						<%=intimationTypeList == null ? "Add " : "Update "%>
-						Intimation Type
+						<%=caseStatusList == null ? "Add " : "Update "%>
+						Case Status
 					</span>
 				</div>
 			</div>
@@ -67,36 +67,36 @@ boolean allow_delete = user_permission.contains("intimationType/delete");
 		<div class="portlet light bordered">
 			<div class="portlet-body">
 				<div id="message_account"></div>
-				<form novalidate id="add_intimation_type" role="form" method="post"
+				<form novalidate id="add_case_status" role="form" method="post"
 					class="form-horizontal">
 					<div class="row">
 						<div class="col-md-6">
 							<div class="form-group">
-								<label class="col-md-4 control-label" for="intimationtypeName">Intimation Type Name
+								<label class="col-md-4 control-label" for="caseStatus">Case Status
 									 <span class="text-danger">*</span>
 								</label>
 								<div class="col-md-8">
-									<input type="text" required placeholder="Intimation Type Name"
-										id="intimationtypeName" class="form-control" name="intimationtypeName"
-										value = "<%=intimationTypeList == null ? "" : intimationTypeList.getIntimationType()%>">
+									<input type="text" placeholder="Case Type Name"
+										id="caseStatus" class="form-control" name="caseStatus"
+										value = "<%=caseStatusList == null ? "" : caseStatusList.getCaseStatus()%>">
 								</div>
 							</div>
 							<div class="form-group">
 								<div class="col-md-offset-4 col-md-8">
 									<%
-									if(intimationTypeList != null){
+									if(caseStatusList != null){
 									%>
-									<input type="hidden" value="<%=intimationTypeList.getIntimationId()%>" id="intimationId"
-										name="intimationId">
-									<button class="btn btn-info" id="editIntimationTypesubmit"
-										onClick="return updateIntimationType();" type="button">Update</button>
-									<a href="${pageContext.request.contextPath}/intimationType/pending"
+									<input type="hidden" value="<%=caseStatusList.getCaseStatusId()%>" id="caseStatusId"
+										name="caseStatusId">
+									<button class="btn btn-info" id="editCaseStatusSubmit"
+										onClick="return updateCaseStatus();" type="button">Update</button>
+									<a href="${pageContext.request.contextPath}/caseStatus/pending"
 										class="btn btn-danger">Back</a>
 									<%
 									}else{
 									%> 
-									<button class="btn btn-info" id="addIntimationTypesubmit"
-										onClick="return addIntimationType();" type="button">Add Intimation</button>
+									<button class="btn btn-info" id="addCaseStatusSubmit"
+										onClick="return addCaseStatus();" type="button">Add Case Status</button>
 									<button class="btn btn-danger" type="reset" value="">Clear</button>
 									<%
 									}
@@ -118,11 +118,11 @@ boolean allow_delete = user_permission.contains("intimationType/delete");
 				<div class="caption">
 					<i class="icon-clock"></i> <span
 						class="caption-subject font-green-sharp sbold">Pending
-						Intimation</span>
+						Case Status</span>
 				</div>
 				<div class="actions">
 					<div class="btn-group">
-						<a href="${pageContext.request.contextPath}/intimationType/add"
+						<a href="${pageContext.request.contextPath}/caseStatus/add"
 							data-toggle="tooltip" title="Add" data-original-title="Add New"
 							class="btn green-haze btn-outline btn-xs pull-right" data-toggle="tooltip"
 							style="margin-right: 5px;"> <i class="fa fa-plus"></i>
@@ -142,7 +142,7 @@ boolean allow_delete = user_permission.contains("intimationType/delete");
 								<thead>
 									<tr class="tbl_head_bg">
 										<th class="head1 no-sort">#</th>
-										<th class="head1 no-sort">Intimation Type Name</th>
+										<th class="head1 no-sort">Case Status</th>
 										<th class="head1 no-sort">Created Date</th>
 										<th class="head1 no-sort">Status</th>
 										<th class="head1 no-sort">Action</th>
@@ -161,24 +161,24 @@ boolean allow_delete = user_permission.contains("intimationType/delete");
 									<%
 									if (pending_list != null) {
 
-									  for (IntimationTypeList list_intimationType : pending_list) {
+									  for (CaseStatusList list_CaseStatus : pending_list) {
 									%>
 									<tr>
-										<td><%=list_intimationType.getSrNo()%></td>
-										<td data-label = "Intimation Type"><%=list_intimationType.getIntimationType()%></td>
-										<td data-label = "Created Date"><%=list_intimationType.getCreatedDate()%></td>										
+										<td><%=list_CaseStatus.getSrNo()%></td>
+										<td data-label = "Case Status"><%=list_CaseStatus.getCaseStatus()%></td>
+										<td data-label = "Created Date"><%=list_CaseStatus.getCreatedDate()%></td>										
 										<td data-label = "Status"><span class="label label-sm label-danger">Pending</span></td>											
 										<td data-label = "Action">
-											<a href="${pageContext.request.contextPath}/intimationType/pending?intimationtypeName=<%=list_intimationType.getIntimationType() %>&intimationId=<%=list_intimationType.getIntimationId() %>" 
+											<a href="${pageContext.request.contextPath}/caseStatus/pending?caseStatus=<%=list_CaseStatus.getCaseStatus() %>&caseStatusId=<%=list_CaseStatus.getCaseStatusId() %>" 
 												data-toggle="tooltip" title="Edit" class="btn btn-primary btn-xs">
 												<i class="glyphicon glyphicon-edit"></i>
 							   		  		</a>
 									   		
-									   		<a href="javascript:;" data-toggle="tooltip" title="Active" onClick="return updateIntimationTypeStatus('<%=list_intimationType.getIntimationId()%>',1,<%=allow_statusChg %>);" 
+									   		<a href="javascript:;" data-toggle="tooltip" title="Active" onClick="return updateStatus('<%=list_CaseStatus.getCaseStatusId()%>',1,<%=allow_statusChg %>);" 
 									   		  	class="btn btn-success btn-xs"><i class="glyphicon glyphicon-ok-circle"></i>
 								   		  	</a>
 									   		
-									   		<a href="#" data-toggle="tooltip" title="Delete" onClick="return deleteIntimationType('<%=list_intimationType.getIntimationId()%>',<%=allow_delete %>);" 
+									   		<a href="#" data-toggle="tooltip" title="Delete" onClick="return deleteCaseStatus('<%=list_CaseStatus.getCaseStatusId()%>',<%=allow_delete %>);" 
 									   		   	class="btn btn-danger btn-xs"><i class="glyphicon glyphicon-remove"></i>
 								   		   	</a>  
 										</td>
@@ -235,29 +235,29 @@ $(document).ready(function()
 	});
 });
 
-function addIntimationType() {
-	<%if(!user_permission.contains("investigationType/add")){%>
+function addCaseStatus() {
+	<%if(!user_permission.contains("caseStatus/add")){%>
 		toastr.error("Access Denied","Error");
 		return false;
 	<%}%>
-	var IntimationtypeName = $('#add_intimation_type #intimationtypeName').val();
-	if (IntimationtypeName == '') {
-		toastr.error('Intimation Type Name Cannot be empty', 'Error');
+	var caseStatus = $('#add_case_status #caseStatus').val();
+	if (caseStatus == '') {
+		toastr.error('Case status cannot be blank', 'Error');
 		return false;
 	}
-	var formdata = {'intimationtypeName' : IntimationtypeName};
+	var formdata = {'caseStatus' : caseStatus};
 	$.ajax({
 		type : "POST",
-		url : '${pageContext.request.contextPath}/intimationType/addIntimationType',
+		url : '${pageContext.request.contextPath}/caseStatus/addCaseStatus',
 		data : formdata,
 		beforeSend : function() {
-			$("#addIntimationTypesubmit")
+			$("#addCaseStatusSubmit")
 				.html('<img src="${pageContext.request.contextPath}/resources/img/input-spinner.gif"> Loading...');
-			$("#addIntimationTypesubmit").prop('disabled', true);
+			$("#addCaseStatusSubmit").prop('disabled', true);
 		},
 		success : function(data) {
-			$("#addIntimationTypesubmit").html('Add Intimation Type');
-			$("#addIntimationTypesubmit").prop('disabled', false);
+			$("#addCaseStatusSubmit").html('Add Case Status');
+			$("#addCaseStatusSubmit").prop('disabled', false);
 			if (data == "****") 
 			{
 				location.reload();
@@ -270,33 +270,33 @@ function addIntimationType() {
 	});
 }
 
-function updateIntimationType() {
-	<%if(!user_permission.contains("intimationType/add")){%>
+function updateCaseStatus() {
+	<%if(!user_permission.contains("caseStatus/add")){%>
 		toastr.error("Access Denied","Error");
 		return false;
 	<%}%>
-	var IntimationtypeName = $('#add_intimation_type #intimationtypeName').val();
-	var IntimationId = $('#add_intimation_type #intimationId').val();
-	if (IntimationtypeName == '') {
-		toastr.error('Intimation Type Name Cannot be empty', 'Error');
+	var caseStatus = $('#add_case_status #caseStatus').val();
+	var caseStatusId = $('#add_case_status #caseStatusId').val();
+	if (caseStatus == '') {
+		toastr.error('Case status cannot be blank', 'Error');
 		return false;
 	}	
-	var formdata = {'intimationtypeName' : IntimationtypeName,'intimationId' : IntimationId};
+	var formdata = {'caseStatus' : caseStatus,'caseStatusId' : caseStatusId};
 		$.ajax({
 			type : "POST",
-			url : '${pageContext.request.contextPath}/intimationType/updateIntimationType',
+			url : '${pageContext.request.contextPath}/caseStatus/updateCaseStatus',
 			data : formdata,
 			beforeSend : function() {
-				$("#editIntimationTypesubmit")
+				$("#editCaseStatusSubmit")
 						.html('<img src="${pageContext.request.contextPath}/resources/img/input-spinner.gif"> Loading...');
-				$("#editIntimationTypesubmit").prop('disabled', true);
+				$("#editCaseStatusSubmit").prop('disabled', true);
 			},
 			success : function(data) {
-				$("#editIntimationTypesubmit").html('Update');
-				$("#editIntimationTypesubmit").prop('disabled', false);
+				$("#editCaseStatusSubmit").html('Update');
+				$("#editCaseStatusSubmit").prop('disabled', false);
 				
 				if (data == "****") 
-					location.href ="${pageContext.request.contextPath}/intimationType/pending";
+					location.href ="${pageContext.request.contextPath}/caseStatus/pending";
 				else 
 					toastr.error(data, 'Error');
 			}

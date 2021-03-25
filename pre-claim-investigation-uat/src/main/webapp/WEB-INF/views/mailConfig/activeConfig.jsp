@@ -11,12 +11,50 @@ boolean allow_delete = user_permission.contains("mailConfig/delete");
 <link href="${pageContext.request.contextPath}/resources/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <script src="${pageContext.request.contextPath}/resources/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/resources/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
+<style>
+@media(max-width:576px)
+{
+	table thead, table tfoot
+	{
+		display:none;
+	}
+
+	table, table tbody, table tr, table td
+	{
+		display : block;
+		width   : 100%;
+	}
+	
+	table td
+	{
+		width : 90%;
+		text-align: right;
+		position   : relative;
+		padding-left: 50%;
+	}
+	table tr
+	{
+		margin-bottom : 15px;
+	}
+	table td::before
+	{
+		 content: attr(data-label);
+		 position : absolute;
+		 left : 10px;
+		 width : 50%;
+		 text-align: left;
+	}
+
+}
+
+
+</style>
 <div class="row">
 	<div class="col-xs-12 col-sm-12">
 		<div class="portlet box">
 			<div class="portlet-title">
 				<div class="caption">
-					<i class="fa fa-inbox font-green-sharp" style = "font-size:20px"></i> <span
+					<i class="icon-check"></i> <span
 						class="caption-subject font-green-sharp sbold">Active Mail Config
 						</span>
 				</div>
@@ -73,19 +111,19 @@ boolean allow_delete = user_permission.contains("mailConfig/delete");
 									%>
 									<tr>
 										<td><%=i++%></td>
-										<td><%= list_config.getUsername() %></td>
-										<td><%= list_config.getPassword() %></td>
-										<td><%= list_config.getOutgoingServer() %></td>
-										<td><%= list_config.getOutgoingPort() %></td>
-										<td><%= list_config.getEncryptionType() %></td>
-										<td>
+										<td data-label = "Username"><%= list_config.getUsername() %></td>
+										<td data-label = "Password"><%= list_config.getPassword() %></td>
+										<td data-label = "Outgoing SMTP Server"><%= list_config.getOutgoingServer() %></td>
+										<td data-label = "Outgoing SMTP Port"><%= list_config.getOutgoingPort() %></td>
+										<td data-label = "Encryption Type"><%= list_config.getEncryptionType() %></td>
+										<td data-label = "Status">
 										<% if(list_config.getStatus() == 1) {%>
 										<span class="label label-sm label-success">Active</span>
 										<%}else{ %>
 										<span class="label label-sm label-danger">Inactive</span>
 										<%} %>
 										</td>
-										<td>
+										<td data-label = "Action">
 										   <a href="${pageContext.request.contextPath}/mailConfig/edit/<%=list_config.getMailConfigId() %>" 										   										   
 										   		data-toggle="tooltip" title="Edit" class="btn btn-primary btn-xs">
 										   		<i class="glyphicon glyphicon-edit"></i>

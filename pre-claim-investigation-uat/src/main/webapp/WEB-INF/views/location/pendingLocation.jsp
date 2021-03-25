@@ -13,12 +13,50 @@ boolean allow_delete = user_permission.contains("location/delete");
 <link href="${pageContext.request.contextPath}/resources/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.css" rel="stylesheet" type="text/css" />
 <script src="${pageContext.request.contextPath}/resources/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
 <script src="${pageContext.request.contextPath}/resources/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
+<style>
+@media(max-width:576px)
+{
+	table thead, table tfoot
+	{
+		display:none;
+	}
+
+	table, table tbody, table tr, table td
+	{
+		display : block;
+		width   : 100%;
+	}
+	
+	table td
+	{
+		width : 90%;
+		text-align: right;
+		position   : relative;
+		padding-left: 50%;
+	}
+	table tr
+	{
+		margin-bottom : 15px;
+	}
+	table td::before
+	{
+		 content: attr(data-label);
+		 position : absolute;
+		 left : 10px;
+		 width : 50%;
+		 text-align: left;
+	}
+
+}
+
+
+</style>
 <div class="row">
 	<div class="col-md-12 col-sm-12">
 		<div class="portlet box">
 			<div class="portlet-title">
 				<div class="caption">
-					<i class="icon-users font-green-sharp"></i>
+					<i class="icon-plus"></i>
 					<span class="caption-subject font-green-sharp sbold">
 						<%= location == null ? "Add " : "Update " %>
 						Location
@@ -96,7 +134,7 @@ boolean allow_delete = user_permission.contains("location/delete");
 		<div class="portlet box">
 			<div class="portlet-title">
 				<div class="caption">
-					<i class="icon-users font-green-sharp"></i> <span
+					 <i class="icon-clock"></i> <span
 						class="caption-subject font-green-sharp sbold">Pending
 						Location</span>
 				</div>
@@ -147,11 +185,11 @@ boolean allow_delete = user_permission.contains("location/delete");
 									%>
 									<tr>
 										<td><%=i%></td>
-										<td><%=list_location.getCity()%></td>
-										<td><%=list_location.getState()%></td>
-										<td><%=list_location.getZone()%></td>
-										<td><span class="label label-sm label-danger">Pending</span></td>
-										<td>
+										<td data-label = "City"><%=list_location.getCity()%></td>
+										<td data-label = "State"><%=list_location.getState()%></td>
+										<td data-label = "Zone"><%=list_location.getZone()%></td>
+										<td data-label = "Status"><span class="label label-sm label-danger">Pending</span></td>
+										<td data-label = "Action">
 										   <a href="${pageContext.request.contextPath}/location/pending?locationId=<%=list_location.getLocationId() %>" 										   										   
 										   		data-toggle="tooltip" title="Edit" class="btn btn-primary btn-xs">
 										   		<i class="glyphicon glyphicon-edit"></i>
@@ -189,6 +227,15 @@ $(document).ready(function() {
 		if (i == 1 || i == 2 || i == 3) 
 		{										
 			$(this).html('<input type="text" class="form-control">');										
+		}
+		else if(i == 4)
+		{
+			var select_box = "<select class = 'form-control'>" +
+				"<option value = ''>All</option>" +
+				"<option value = 'Active'>Active</option>" +
+			 	"<option value = 'Inactive'>Inactive</option>" +
+			 "</select>";
+			$(this).html(select_box);
 		}
 		i++;									
 	});
