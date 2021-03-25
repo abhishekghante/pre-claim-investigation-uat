@@ -376,14 +376,15 @@ public class CaseController {
 		//Get Case Status
 		CaseSubStatus status = new CaseSubStatus();
 		//Approved
+		//3 places these logic needs to be changed - Update, Assign & Bulk Assign
 		if(toStatus.equals("Approved"))
 		{
-			if(caseSubStatus == null)
+			if(caseSubStatus.equals(""))
 			{
-				if(user.getAccount_type().equals("INV") && toRole.equals("AGNSUP"))
-					status = caseDao.getCaseStatus(toRole, 2);
+				if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+					status = caseDao.getCaseStatus(user.getAccount_type(), 2);
 				else
-					status = caseDao.getCaseStatus(toRole, 1);
+					status = caseDao.getCaseStatus(user.getAccount_type(), 1);
 				caseDetail.setCaseStatus(status.getCase_status());
 				caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 			}
@@ -397,7 +398,7 @@ public class CaseController {
 		//Reopen
 		else if(toStatus.equals("Reopen"))
 		{
-			status = caseDao.getCaseStatus(toRole, -1);
+			status = caseDao.getCaseStatus(user.getAccount_type(), -1);
 			caseDetail.setCaseStatus(status.getCase_status());
 			caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 		}
@@ -444,14 +445,15 @@ public class CaseController {
 		caseDetail.setCaseId(caseId);
 		CaseSubStatus status = new CaseSubStatus();
 		//Approved
+		//3 places these logic needs to be changed - Update, Assign & Bulk Assign
 		if(toStatus.equals("Approved"))
 		{
-			if(caseSubStatus == null)
+			if(caseSubStatus.equals(""))
 			{
-				if(user.getAccount_type().equals("INV") && toRole.equals("AGNSUP"))
-					status = caseDao.getCaseStatus(toRole, 2);
+				if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+					status = caseDao.getCaseStatus(user.getAccount_type(), 2);
 				else
-					status = caseDao.getCaseStatus(toRole, 1);
+					status = caseDao.getCaseStatus(user.getAccount_type(), 1);
 				caseDetail.setCaseStatus(status.getCase_status());
 				caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 			}
@@ -465,7 +467,7 @@ public class CaseController {
 		//Reopen
 		else if(toStatus.equals("Reopen"))
 		{
-			status = caseDao.getCaseStatus(toRole, -1);
+			status = caseDao.getCaseStatus(user.getAccount_type(), -1);
 			caseDetail.setCaseStatus(status.getCase_status());
 			caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 		}
@@ -544,17 +546,17 @@ public class CaseController {
 		//Approved
 		if(toStatus.equals("Approved"))
 		{
-			if(user.getAccount_type().equals("INV") && toRole.equals("AGNSUP"))
-				status = caseDao.getCaseStatus(toRole, 2);
+			if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+				status = caseDao.getCaseStatus(user.getAccount_type(), 2);
 			else
-				status = caseDao.getCaseStatus(toRole, 1);
+				status = caseDao.getCaseStatus(user.getAccount_type(), 1);
 			caseDetail.setCaseStatus(status.getCase_status());
 			caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 		}
 		//Reopen
 		else if(toStatus.equals("Reopen"))
 		{
-			status = caseDao.getCaseStatus(toRole, -1);
+			status = caseDao.getCaseStatus(user.getAccount_type(), -1);
 			caseDetail.setCaseStatus(status.getCase_status());
 			caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 		}

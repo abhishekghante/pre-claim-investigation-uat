@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
@@ -89,9 +90,7 @@ public class CaseDaoImpl implements CaseDao {
 	public long addcase(CaseDetails casedetail) {
 		try 
 		{
-			String sql = "SELECT count(*) from case_lists where policyNumber = '" + casedetail.getPolicyNumber() + "'";
-			int PolicyNumberExists = template.queryForObject(sql, Integer.class);
-			if(PolicyNumberExists > 0)
+			if(!checkPolicyNumber(casedetail.getPolicyNumber()))
 				return 1;
 			
 			String current_date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -396,13 +395,28 @@ public class CaseDaoImpl implements CaseDao {
 				Iterator<Cell> cellIterator = row.cellIterator(); // iterating over each column
 				CaseDetails caseDetails = new CaseDetails();
 				Cell cell;
-				if (cellIterator.hasNext()) {
+				if (cellIterator.hasNext())
+				{
 					cell = cellIterator.next();
 					caseDetails.setPolicyNumber(readCellStringValue(cell).toUpperCase());
-					if(!Pattern.matches("[CU]{1}[0-9]{9}",caseDetails.getPolicyNumber()))
+					if (!(caseDetails.getPolicyNumber().startsWith("C")||caseDetails.getPolicyNumber().startsWith("U")))							
 						error_message += "Invalid Policy Number, ";
-					else if(!checkPolicyNumber(caseDetails.getPolicyNumber()))
-						error_message += "Policy Number already exists, ";
+					else if(caseDetails.getPolicyNumber().length() != 10)
+						error_message += "Policy Number is not equal to 10 chars, ";	
+					else if(caseDetails.getPolicyNumber().length() == 10)	   
+					{
+						String regex = "[C/U]{1}[0-9]{9}";
+						Pattern p = Pattern.compile(regex);
+						Matcher m = p.matcher(caseDetails.getPolicyNumber());
+						if(m.matches() == false) 
+							error_message += "Policy Number should be in this format"
+									+ "(CXXXXXXXXXX/UXXXXXXXXXX), ";
+						else
+						{
+							if(!checkPolicyNumber(caseDetails.getPolicyNumber()))
+								error_message = "Policy Number already exists, ";
+						}
+					}
 				}
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
@@ -422,7 +436,7 @@ public class CaseDaoImpl implements CaseDao {
 					cell = cellIterator.next();
 					caseDetails.setIntimationType(readCellStringValue(cell));
 					if (!intimation_list.contains(caseDetails.getIntimationType()))
-						error_message += "Invalid Intimation Type, ";
+						error_message += "Invalid Intimation Type";
 					intimationType = caseDetails.getIntimationType().toUpperCase();
 				}
 				if (cellIterator.hasNext()) {
@@ -452,7 +466,7 @@ public class CaseDaoImpl implements CaseDao {
 					} catch (Exception e) {
 						if (!(intimationType.equals("PIV") || intimationType.equals("PIRV")
 								|| intimationType.equals("LIVE")))
-							error_message += "Insured DOB is mandatory, ";
+							error_message += "Insured DOB is mandatory";
 					}
 				}
 				if (cellIterator.hasNext()) {
