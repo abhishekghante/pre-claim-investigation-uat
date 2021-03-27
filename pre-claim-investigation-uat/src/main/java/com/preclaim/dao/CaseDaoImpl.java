@@ -474,9 +474,7 @@ public class CaseDaoImpl implements CaseDao {
 					if (!intimation_list.contains(caseDetails.getIntimationType())) {
 						error_message += "Invalid Intimation Type";					
 					}
-					//-------------//////
-					
-					if (assigneeId!=null) {
+					if (assigneeId != null) {
 						if(!caseDetails.getIntimationType().equals("CDP")) {
 							error_message += "Intimation Type should be CDP";
 						}
@@ -486,11 +484,7 @@ public class CaseDaoImpl implements CaseDao {
 					else
 					{
 						intimationType = caseDetails.getIntimationType().toUpperCase();
-						
-					}
-					
-					////----------/////
-						
+					}					
 				}
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
