@@ -4,7 +4,6 @@
 <%@page import = "com.preclaim.models.CaseDetailList"%>
 <%@page import = "com.preclaim.models.CaseDetails"%>
 <%@page import = "com.preclaim.models.Location"%>
-<%@page import = "com.preclaim.models.UserRole"%>
 <%@page import = "com.preclaim.models.CaseSubStatus"%>
 <%@page import = "com.preclaim.models.IntimationType" %>
 <%@page import = "com.preclaim.models.InvestigationType" %>
@@ -24,8 +23,6 @@ System.out.println(CaseSubStatus);
 session.removeAttribute("level");
 List<Location> location_list = (List<Location>) session.getAttribute("location_list");
 session.removeAttribute("location_list");
-List<UserRole> userRole =(List<UserRole>)session.getAttribute("userRole");
-session.removeAttribute("userRole");
 boolean allow_edit = user_permission.contains("messages/add");
 boolean allow_assign = user_permission.contains("messages/assign");
 boolean allow_reopen = user_permission.contains("messages/reopen");
@@ -83,6 +80,7 @@ boolean allow_bulkAssign = user_permission.contains("messages/bulkAssign");
                           <th class="head1 no-sort">Case Sub-status</th>
                           <th class="head1 no-sort">Zone</th>
                           <th class="head1 no-sort">View history</th>
+                          <th class="head1 no-sort">Created Date</th>
                           <th class="head1 no-sort">Action</th>
                         </tr>
                       </thead>
@@ -102,6 +100,7 @@ boolean allow_bulkAssign = user_permission.contains("messages/bulkAssign");
                           <th class="head2 no-sort"></th>
                           <th class="head2 no-sort"></th>
                           <th class="head2 no-sort"></th>
+                           <th class="head2 no-sort"></th>
                         </tr>
                       </tfoot>
                       <tbody>
@@ -122,6 +121,7 @@ boolean allow_bulkAssign = user_permission.contains("messages/bulkAssign");
                                 <td data-label = "Case Sub-Status"><%=list_case.getCaseSubStatus()%></td>
                                 <td data-label = "Zone"><%=list_case.getZone()%></td>
                                	<td data-label = "Timeline"><a href="${pageContext.request.contextPath}/message/case_history?caseId=<%=list_case.getCaseId()%>">Case History</a></td>
+                               <td data-label = "Created Date"><%=list_case.getCreatedDate()%></td>
                                 <td data-label = "Action">
 	                             <a href="${pageContext.request.contextPath}/message/edit?caseId=<%=list_case.getCaseId()%>" 
 	                             	data-toggle="tooltip" title="Edit" class="btn btn-primary btn-xs">
@@ -152,17 +152,27 @@ boolean allow_bulkAssign = user_permission.contains("messages/bulkAssign");
                    <%if(allow_bulkAssign){  %> 
                     <div class="form-group">
                       <div class="form-group selectDiv" id = "case-closure">
-	                <label class="col-md-1 control-label" for="toRole">Select Role Name 
+                      <label class="col-md-1 control-label" for="toStatus">Case Status 
+	                	<span class="text-danger">*</span></label>
+		              <div class="col-md-2">
+		                  <select name="toStatus" id="toStatus" class="form-control" 
+		                  	tabindex="-1">
+		                    <option value="-1">Select</option>
+		                    <option value = "Approved">Approved</option>
+		                    <%if(allow_reopen) {%>
+		                    <option value = "Reopen">Reopen</option>
+		                    <%} %>
+		                    <%if(allow_closure) {%>
+		                    <option value = "Closed">Closure</option>
+		                    <%} %> 
+		                  </select>
+		              </div>
+	                
+             		<label class="col-md-1 control-label" for="toRole">Select Role Name 
 	                	<span class="text-danger">*</span></label>
 	                <div class="col-md-2">
-	                  <select name="toRole" id="toRole" class="form-control" tabindex="-1"
-	                  	>
-	                    <option value="-1" selected disabled>Select</option>
-	                     <%if(userRole != null){
-	                    	for(UserRole userRoleLists: userRole){%>
-	                    	<option value = "<%=userRoleLists.getRole_code()%>">
-	                    		<%=userRoleLists.getRole() %></option>
-	                    <%}} %> 
+	                  <select name="toRole" id="toRole" class="form-control" tabindex="-1">
+	                    <option value="-1" selected disabled>Select</option> 
 	                  </select>
 	                </div>
                 
@@ -173,21 +183,7 @@ boolean allow_bulkAssign = user_permission.contains("messages/bulkAssign");
 	                  	<option value = '-1' selected disabled>Select</option>
 	                  </select>
 	            	</div>
-	            	<label class="col-md-1 control-label" for="toStatus">Case Status 
-	                	<span class="text-danger">*</span></label>
-	                <div class="col-md-2">
-	                  <select name="toStatus" id="toStatus" class="form-control" 
-	                  	tabindex="-1">
-	                    <option value="-1">Select</option>
-	                    <option value = "Approved">Approved</option>
-	                    <%if(allow_reopen) {%>
-	                    <option value = "Reopen">Reopen</option>
-	                    <%} %>
-	                    <%if(allow_closure) {%>
-	                    <option value = "Closed">Closure</option>
-	                    <%} %> 
-	                  </select>
-	                </div> 
+	            	 
 	                <div class="row">
 	                      <label class="col-sm-1 control-label" for="toRemarks">Remarks :</label>
 	                  <div class="col-sm-2">
@@ -476,29 +472,42 @@ $("#toRole").change(function(){
 });
 </script>
 
-<!-- <script>
+<script>
 $("#toStatus").change(function(){
 	console.log($("#toStatus option:selected").val());
 	var status = $(this).val();
 	
 	if(status == "Closed")
 		return;
+	
+	$("#toRole option").each(function(){
+		if($(this).val() != '-1')
+			$(this).remove();
+	});
+	$("#toRole").prop("disabled",true);
 	$.ajax({
 	    type: "POST",
 	    url: 'getUserRoleBystatus',
 	    data: {"status": status},
 	    success: function(roleList)
 	    {
+	    	if(roleList == "")
+	    		return;
 	    	console.log(roleList);
 	  		var options = "";
 	    	for(i = 0; i < roleList.length ; i++)
-	  			{
-	  				options += "<option value ='" + userList[i].username + "'>" + userList[i].full_name + "</option>";  
-	  			}
-	    	$("#toId").append(options);
+  			{
+  				options += "<option value ='" + roleList[i].role_code + "'>" + roleList[i].role + "</option>";  
+  			}
+	    	$("#toRole").append(options);
+	    	$("#toRole").prop("disabled",false);
+	    	if($("#toRole").val() != null)
+		    	$("#toRole").trigger("change");
+		    
 	    }
+	    
 });
 
 });
-</script> -->
+</script>
 

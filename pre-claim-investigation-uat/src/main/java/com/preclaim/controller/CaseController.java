@@ -140,7 +140,6 @@ public class CaseController {
 		}
 		Location location = locationDao.getActiveLocationList(user.getCity());
 		session.setAttribute("ScreenDetails", details);
-		session.setAttribute("userRole", userDao.getUserRole_lists(user.getAccount_type(), "Approved"));
 		session.setAttribute("pendingCaseList", caseDao.getPendingCaseList(user.getAccount_type(),location.getZone(),user.getUsername()));
 		session.setAttribute("investigation_list", investigationDao.getActiveInvestigationList());
 		session.setAttribute("intimation_list", intimationTypeDao.getActiveIntimationType());
@@ -240,6 +239,7 @@ public class CaseController {
 		caseDetail.setNomineeContactNumber(request.getParameter("nomineeMob"));
 		caseDetail.setNominee_address(request.getParameter("nomineeAdd"));
 		caseDetail.setInsured_address(request.getParameter("insuredAdd"));
+		caseDetail.setPincode(request.getParameter("pincode"));
 		caseDetail.setCreatedBy(user.getUsername());
 		//Get Case Status
 		CaseSubStatus status = caseDao.getCaseStatus(user.getAccount_type(), 1);
@@ -264,6 +264,7 @@ public class CaseController {
 		caseMovement.setFromId(caseDetail.getCreatedBy());
 		caseMovement.setZone(zone);
 		caseMovement.setUser_role(request.getParameter("roleName"));
+		caseMovement.setToId(request.getParameter("assigneeId"));
 		String message = caseMovementDao.CreatecaseMovement(caseMovement);
 		if (message.equals("****")) 
 		{
@@ -331,7 +332,6 @@ public class CaseController {
 		details.setSub_menu2("Manage Cases");
 		details.setSub_menu2_path("../message/pending_message.jsp");
 		session.setAttribute("ScreenDetails", details);
-		session.setAttribute("userRole", userDao.getUserRole_lists(user.getAccount_type(), "Approved"));
 		session.setAttribute("location_list", locationDao.getActiveLocationList());
 		session.setAttribute("investigation_list", investigationDao.getActiveInvestigationList());
 		session.setAttribute("intimation_list", intimationTypeDao.getActiveIntimationType());
@@ -356,6 +356,7 @@ public class CaseController {
 		caseDetail.setIntimationType(request.getParameter("msgIntimationType"));
 		caseDetail.setLocationId(Integer.parseInt(request.getParameter("locationId")));
 		caseDetail.setNominee_name(request.getParameter("nomineeName"));
+		caseDetail.setPincode(request.getParameter("pincode"));
 		caseDetail.setNomineeContactNumber(request.getParameter("nomineeMob"));
 		caseDetail.setNominee_address(request.getParameter("nomineeAdd"));
 		caseDetail.setInsured_address(request.getParameter("insuredAdd"));
@@ -381,18 +382,24 @@ public class CaseController {
 		{
 			if(caseSubStatus.equals(""))
 			{
-				if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+				if(user.getAccount_type().equals("AGNSUP") && toRole.equals("REGMAN"))
 					status = caseDao.getCaseStatus(user.getAccount_type(), 2);
+				else if(user.getAccount_type().equals("REGMAN") && toRole.equals("UW"))
+					status = caseDao.getCaseStatus(user.getAccount_type(), 2);
+				else if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+					status = caseDao.getCaseStatus(user.getAccount_type(), 3);	
 				else
 					status = caseDao.getCaseStatus(user.getAccount_type(), 1);
+				if(status == null)
+					status = new CaseSubStatus();
 				caseDetail.setCaseStatus(status.getCase_status());
 				caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 			}
 			else
 			{
-				caseDetail.setCaseStatus(caseSubStatus);
-				if(NotCleanCategory != null)
-					caseDetail.setCaseSubStatus(NotCleanCategory);
+				caseDetail.setCaseStatus("Open");
+				caseDetail.setCaseSubStatus(caseSubStatus);
+				caseDetail.setNotCleanCategory(NotCleanCategory);
 			}
 		}
 		//Reopen
@@ -450,18 +457,24 @@ public class CaseController {
 		{
 			if(caseSubStatus.equals(""))
 			{
-				if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+				if(user.getAccount_type().equals("AGNSUP") && toRole.equals("REGMAN"))
 					status = caseDao.getCaseStatus(user.getAccount_type(), 2);
+				else if(user.getAccount_type().equals("REGMAN") && toRole.equals("UW"))
+					status = caseDao.getCaseStatus(user.getAccount_type(), 2);
+				else if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+					status = caseDao.getCaseStatus(user.getAccount_type(), 3);	
 				else
 					status = caseDao.getCaseStatus(user.getAccount_type(), 1);
+				if(status == null)
+					status = new CaseSubStatus();
 				caseDetail.setCaseStatus(status.getCase_status());
 				caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 			}
 			else
 			{
-				caseDetail.setCaseStatus(caseSubStatus);
-				if(NotCleanCategory != null)
-					caseDetail.setCaseSubStatus(NotCleanCategory);
+				caseDetail.setCaseStatus("Open");
+				caseDetail.setCaseSubStatus(caseSubStatus);
+				caseDetail.setNotCleanCategory(NotCleanCategory);
 			}
 		}
 		//Reopen
@@ -546,10 +559,16 @@ public class CaseController {
 		//Approved
 		if(toStatus.equals("Approved"))
 		{
-			if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+			if(user.getAccount_type().equals("AGNSUP") && toRole.equals("REGMAN"))
 				status = caseDao.getCaseStatus(user.getAccount_type(), 2);
+			else if(user.getAccount_type().equals("REGMAN") && toRole.equals("UW"))
+				status = caseDao.getCaseStatus(user.getAccount_type(), 2);
+			else if(user.getAccount_type().equals("AGNSUP") && toRole.equals("CLAMAN"))
+				status = caseDao.getCaseStatus(user.getAccount_type(), 3);	
 			else
 				status = caseDao.getCaseStatus(user.getAccount_type(), 1);
+			if(status == null)
+				status = new CaseSubStatus();
 			caseDetail.setCaseStatus(status.getCase_status());
 			caseDetail.setCaseSubStatus(status.getCaseSubStatus());
 		}
