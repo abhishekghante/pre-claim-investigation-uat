@@ -631,8 +631,8 @@ public class CaseDaoImpl implements CaseDao {
 			}}
 			
 			// Error File
-			if (error_case.size() != 0)
-				writeErrorCase(error_case);
+			//if (error_case.size() != 0)
+			writeErrorCase(error_case);
 			return "****";
 		} 
 		catch (Exception e) 
