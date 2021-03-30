@@ -136,117 +136,57 @@ public class CaseDaoImpl implements CaseDao {
 	public List<CaseDetailList> getPendingCaseList(String user_role, String zone, String username) {
 		try {
 			String sql = "";
+			Object [] obj;
 			if (user_role.equalsIgnoreCase("RCU")) 
 			{
 				sql = "SELECT * FROM case_lists a, case_movement b where a.caseId = b.caseId and "
 						+ "a.caseStatus <> 'Closed' and (b.fromId = ? and b.user_role ='REGMAN' and "
 						+ "b.toId ='')";
-				List<CaseDetailList> casedetailList = template.query(sql, new Object[] { username},
-						(ResultSet rs, int rowCount) -> {
-							CaseDetailList casedetail = new CaseDetailList();
-							casedetail.setSrNo(rowCount + 1);
-							casedetail.setCaseId(rs.getLong("caseId"));
-							casedetail.setPolicyNumber(rs.getString("policyNumber"));
-							casedetail.setInsuredName(rs.getString("insuredName"));
-							casedetail.setInvestigationCategoryId(rs.getInt("investigationId"));
-							casedetail.setSumAssured(rs.getDouble("sumAssured"));
-							casedetail.setCaseStatus(rs.getString("caseStatus"));
-							casedetail.setIntimationType(rs.getString("intimationType"));
-							casedetail.setNotCleanCategory(rs.getString("notCleanCategory"));
-							casedetail.setCaseSubStatus(rs.getString("caseSubStatus"));
-							casedetail.setZone(rs.getString("zone"));
-							casedetail.setCreatedDate(rs.getString("createdDate"));
-							return casedetail;
-						});
-				HashMap<Integer, String> investigationList = investigationDao.getActiveInvestigationMapping();
-				for (CaseDetailList caseDetail : casedetailList)
-					caseDetail.setInvestigationCategory(
-							investigationList.get(Integer.valueOf(caseDetail.getInvestigationCategoryId())));
-				return casedetailList;
-
+				obj = new Object[] { username};
 			}
 			else if (user_role.equalsIgnoreCase("SUPADM")) 
 			{
 				sql = "SELECT * FROM case_lists a, case_movement b where a.caseId = b.caseId and "
 						+ "a.caseStatus <> 'Closed' and (b.user_role ='REGMAN' and b.toId ='')";
-				List<CaseDetailList> casedetailList = template.query(sql,
-						(ResultSet rs, int rowCount) -> {
-							CaseDetailList casedetail = new CaseDetailList();
-							casedetail.setSrNo(rowCount + 1);
-							casedetail.setCaseId(rs.getLong("caseId"));
-							casedetail.setPolicyNumber(rs.getString("policyNumber"));
-							casedetail.setInsuredName(rs.getString("insuredName"));
-							casedetail.setInvestigationCategoryId(rs.getInt("investigationId"));
-							casedetail.setSumAssured(rs.getDouble("sumAssured"));
-							casedetail.setCaseStatus(rs.getString("caseStatus"));
-							casedetail.setIntimationType(rs.getString("intimationType"));
-							casedetail.setNotCleanCategory(rs.getString("notCleanCategory"));
-							casedetail.setCaseSubStatus(rs.getString("caseSubStatus"));
-							casedetail.setZone(rs.getString("zone"));
-							casedetail.setCreatedDate(rs.getString("createdDate"));
-							return casedetail;
-						});
-				HashMap<Integer, String> investigationList = investigationDao.getActiveInvestigationMapping();
-				for (CaseDetailList caseDetail : casedetailList)
-					caseDetail.setInvestigationCategory(
-							investigationList.get(Integer.valueOf(caseDetail.getInvestigationCategoryId())));
-				return casedetailList;
-
+				obj = new Object[] {};
 			}
 			else if(user_role.equalsIgnoreCase("REGMAN")) 
 			{
 				sql = "SELECT * FROM case_lists a, case_movement b where a.caseId = b.caseId "
 						+ "and a.caseStatus <> 'Closed' and "
 						+ "(toId = ? or (b.user_role = ? and b.zone = ? and b.toId =''))";
-				List<CaseDetailList> casedetailList = template.query(sql, new Object[] {username, user_role,zone },
-						(ResultSet rs, int rowCount) -> {
-							CaseDetailList casedetail = new CaseDetailList();
-							casedetail.setSrNo(rowCount + 1);
-							casedetail.setCaseId(rs.getLong("caseId"));
-							casedetail.setPolicyNumber(rs.getString("policyNumber"));
-							casedetail.setInsuredName(rs.getString("insuredName"));
-							casedetail.setInvestigationCategoryId(rs.getInt("investigationId"));
-							casedetail.setSumAssured(rs.getDouble("sumAssured"));
-							casedetail.setCaseStatus(rs.getString("caseStatus"));
-							casedetail.setIntimationType(rs.getString("intimationType"));
-							casedetail.setNotCleanCategory(rs.getString("notCleanCategory"));
-							casedetail.setCaseSubStatus(rs.getString("caseSubStatus"));
-							casedetail.setZone(rs.getString("zone"));
-							casedetail.setCreatedDate(rs.getString("createdDate"));
-							return casedetail;
-						});
-				HashMap<Integer, String> investigationList = investigationDao.getActiveInvestigationMapping();
-				for (CaseDetailList caseDetail : casedetailList)
-					caseDetail.setInvestigationCategory(
-							investigationList.get(Integer.valueOf(caseDetail.getInvestigationCategoryId())));
-				return casedetailList;
+				obj = new Object[] { username, user_role,zone };
 			}
 			else 
 			{	
-				sql = " SELECT * FROM case_lists a, case_movement b where a.caseId = b.caseId and a.caseStatus <> 'Closed' and b.toId =?";
-				List<CaseDetailList> casedetailList = template.query(sql, new Object[] {username},
-						(ResultSet rs, int rowCount) -> {
-							CaseDetailList casedetail = new CaseDetailList();
-							casedetail.setSrNo(rowCount + 1);
-							casedetail.setCaseId(rs.getLong("caseId"));
-							casedetail.setPolicyNumber(rs.getString("policyNumber"));
-							casedetail.setInsuredName(rs.getString("insuredName"));
-							casedetail.setInvestigationCategoryId(rs.getInt("investigationId"));
-							casedetail.setSumAssured(rs.getDouble("sumAssured"));
-							casedetail.setCaseStatus(rs.getString("caseStatus"));
-							casedetail.setIntimationType(rs.getString("intimationType"));
-							casedetail.setNotCleanCategory(rs.getString("notCleanCategory"));
-							casedetail.setCaseSubStatus(rs.getString("caseSubStatus"));
-							casedetail.setZone(rs.getString("zone"));
-							casedetail.setCreatedDate(rs.getString("createdDate"));
-							return casedetail;
-						});
-				HashMap<Integer, String> investigationList = investigationDao.getActiveInvestigationMapping();
-				for (CaseDetailList caseDetail : casedetailList)
-					caseDetail.setInvestigationCategory(
-							investigationList.get(Integer.valueOf(caseDetail.getInvestigationCategoryId())));
-				return casedetailList;	
+				sql = " SELECT * FROM case_lists a, case_movement b where a.caseId = b.caseId and "
+						+ "a.caseStatus <> 'Closed' and b.toId =?";
+				obj = new Object[] { username};
 			}
+			
+			List<CaseDetailList> casedetailList = template.query(sql, obj,
+					(ResultSet rs, int rowCount) -> {
+						CaseDetailList casedetail = new CaseDetailList();
+						casedetail.setSrNo(rowCount + 1);
+						casedetail.setCaseId(rs.getLong("caseId"));
+						casedetail.setPolicyNumber(rs.getString("policyNumber"));
+						casedetail.setInsuredName(rs.getString("insuredName"));
+						casedetail.setInvestigationCategoryId(rs.getInt("investigationId"));
+						casedetail.setSumAssured(rs.getDouble("sumAssured"));
+						casedetail.setCaseStatus(rs.getString("caseStatus"));
+						casedetail.setIntimationType(rs.getString("intimationType"));
+						casedetail.setNotCleanCategory(rs.getString("notCleanCategory"));
+						casedetail.setCaseSubStatus(rs.getString("caseSubStatus"));
+						casedetail.setZone(rs.getString("zone"));
+						casedetail.setCreatedDate(rs.getString("createdDate"));
+						return casedetail;
+					});
+			HashMap<Integer, String> investigationList = investigationDao.getActiveInvestigationMapping();
+			for (CaseDetailList caseDetail : casedetailList)
+				caseDetail.setInvestigationCategory(
+						investigationList.get(Integer.valueOf(caseDetail.getInvestigationCategoryId())));
+			return casedetailList;
+
 
 		} 
 		catch (Exception ex) 
@@ -423,10 +363,11 @@ public class CaseDaoImpl implements CaseDao {
 				wb.close();
 				return error_message;
 			}
-			CaseSubStatus status = caseDao.getCaseStatus(fromUser.getAccount_type(), 1);
+			CaseSubStatus status = caseDao.getCaseStatus(fromUser.getAccount_type(),user_role, 1);
 			List<InvestigationType> investigation_list = investigationDao.getActiveInvestigationList();
 			List<String> intimation_list = intimationTypeDao.getActiveIntimationTypeStringList();
-			List<Location> location_list = locationDao.getActiveLocationList();
+			List<Location> location_list = locationDao.getActiveLocationList();	
+			UserDetails userDetails = userDao.getUserDetails(assigneeId);
 			Map<CaseDetails, String> error_case = new HashMap<CaseDetails, String>();
 			while (itr.hasNext()) {
 				error_message = "";
@@ -435,6 +376,7 @@ public class CaseDaoImpl implements CaseDao {
 				Iterator<Cell> cellIterator = row.cellIterator(); // iterating over each column
 				CaseDetails caseDetails = new CaseDetails();
 				Cell cell;
+				//Policy Number
 				if (cellIterator.hasNext())
 				{
 					cell = cellIterator.next();
@@ -445,7 +387,7 @@ public class CaseDaoImpl implements CaseDao {
 						error_message += "Policy Number is not equal to 10 chars, ";	
 					else if(caseDetails.getPolicyNumber().length() == 10)	   
 					{
-						String regex = "[C/U]{1}[0-9]{9}";
+						String regex = "[CU]{1}[0-9]{9}";
 						Pattern p = Pattern.compile(regex);
 						Matcher m = p.matcher(caseDetails.getPolicyNumber());
 						if(m.matches() == false) 
@@ -458,6 +400,7 @@ public class CaseDaoImpl implements CaseDao {
 						}
 					}
 				}
+				//Investigation Type
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					String investigationCategory = readCellStringValue(cell);
@@ -472,87 +415,119 @@ public class CaseDaoImpl implements CaseDao {
 						error_message += "Invalid Investigation Type, ";
 
 				}
+				//Intimation Type
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					caseDetails.setIntimationType(readCellStringValue(cell));
 					if (!intimation_list.contains(caseDetails.getIntimationType())) {
 						error_message += "Invalid Intimation Type";					
 					}
-					if (assigneeId != null) {
-						if(!caseDetails.getIntimationType().equals("CDP")) {
+					if (assigneeId != null) 
+					{
+						if(!caseDetails.getIntimationType().equals("CDP"))
 							error_message += "Intimation Type should be CDP";
-						}
 						intimationType = caseDetails.getIntimationType().toUpperCase();
-					
 					}
 					else
-					{
-						intimationType = caseDetails.getIntimationType().toUpperCase();
-					}					
+						intimationType = caseDetails.getIntimationType().toUpperCase();					
 				}
-				if (cellIterator.hasNext()) {
+				//Insured Name
+				if (cellIterator.hasNext()) 
+				{
 					cell = cellIterator.next();
 					caseDetails.setInsuredName(readCellStringValue(cell));
-					if (caseDetails.getInsuredName().equals("")) {
-
+					if (caseDetails.getInsuredName().equals("")) 
+					{
 						if (!(intimationType.equals("PIV") || intimationType.equals("PIRV")
 								|| intimationType.equals("LIVE")))
 							error_message += "Insured Name is mandatory, ";
 					}
 				}
-				if (cellIterator.hasNext()) {
+				//Insured DOD
+				if (cellIterator.hasNext()) 
+				{
 					cell = cellIterator.next();
-					try {
+					try 
+					{
 						caseDetails.setInsuredDOD(readCellDateValue(cell));
-					} catch (Exception ex) {
+					} 
+					catch (Exception ex) 
+					{
 						if (!(intimationType.equals("PIV") || intimationType.equals("PIRV")
 								|| intimationType.equals("LIVE")))
 							error_message += "Insured DOD is mandatory, ";
 					}
 				}
-				if (cellIterator.hasNext()) {
+				//Insured DOB
+				if (cellIterator.hasNext()) 
+				{
 					cell = cellIterator.next();
-					try {
+					try 
+					{
 						caseDetails.setInsuredDOB(readCellDateValue(cell));
-					} catch (Exception e) {
+					} 
+					catch (Exception e) 
+					{
 						if (!(intimationType.equals("PIV") || intimationType.equals("PIRV")
 								|| intimationType.equals("LIVE")))
 							error_message += "Insured DOB is mandatory";
 					}
 				}
+				//Sum Assured
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
-					try {
+					try 
+					{
 						caseDetails.setSumAssured(readCellIntValue(cell));
-					} catch (Exception e) {
+					} 
+					catch (Exception e) 
+					{
 						error_message += "Invalid Sum Assured, ";
 						caseDetails.setSumAssured(0);
 					}
 				}
-				if (cellIterator.hasNext()) {
-					cell = cellIterator.next();
+				//Claimant City
+				if (cellIterator.hasNext()) 
+				{
+					cell = cellIterator.next();	
 					caseDetails.setClaimantCity(readCellStringValue(cell));
-					for (Location list : location_list) {
-						if (caseDetails.getClaimantCity().equalsIgnoreCase(list.getCity())) {
-							caseDetails.setLocationId(list.getLocationId());
-							caseDetails.setClaimantState(list.getState());
-							caseDetails.setClaimantZone(list.getZone());
-							break;
+					if (caseDetails.getClaimantCity().equals(""))
+						error_message = "City cannot be blank, ";
+					else
+					{
+						for (Location list : location_list)
+						{
+							if (caseDetails.getClaimantCity().equalsIgnoreCase(list.getCity()))
+							{
+								caseDetails.setLocationId(list.getLocationId());
+								caseDetails.setClaimantState(list.getState());
+								caseDetails.setClaimantZone(list.getZone());
+								break;
+							}
 						}
+						
+						if(fromUser.getAccount_type().equals("CLAMAN"))
+						{
+							if(!caseDetails.getClaimantCity().equalsIgnoreCase(userDetails.getCity()))
+								error_message = "Agent city is not same as Claimant City, ";
+						}
+					
+						if (caseDetails.getClaimantState().equals(""))
+							error_message = "City not present in database, ";
 					}
-					if (caseDetails.getClaimantState().equals(""))
-						error_message = "City not present in database, ";
-				}
-				if (cellIterator.hasNext()) {
+				}					
+				//Nominee Name		
+				if (cellIterator.hasNext()) 
+				{
 					cell = cellIterator.next();
 					caseDetails.setNominee_name(readCellStringValue(cell));
 					if (caseDetails.getNominee_name().equals("")) {
-
 						if (!(intimationType.equals("PIV") || intimationType.equals("PIRV")
 								|| intimationType.equals("LIVE")))
 							error_message += "Nominee Name is mandatory, ";
 					}
 				}
+				//Nominee Address
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					try {
@@ -570,6 +545,7 @@ public class CaseDaoImpl implements CaseDao {
 							error_message += "Nominee Address is mandatory, ";
 					}
 				}
+				//Nominee Pincode
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					if (readCellStringValue(cell).equals("")) {
@@ -593,6 +569,7 @@ public class CaseDaoImpl implements CaseDao {
 						}
 					}
 				}
+				//Insured Address
 				if (cellIterator.hasNext()) {
 					cell = cellIterator.next();
 					caseDetails.setInsured_address(readCellStringValue(cell));
@@ -882,14 +859,15 @@ public class CaseDaoImpl implements CaseDao {
 	}
 
 	@Override
-	public CaseSubStatus getCaseStatus(String user_role, int level) {
+	public CaseSubStatus getCaseStatus(String fromRole, String user_role, int level) {
 		try
 		{
 			CaseSubStatus detail = new CaseSubStatus();
-			String sql = "SELECT * FROM case_substatus where user_role = ? and level = ?";
-			template.query(sql, new Object[] {user_role, level},
+			String sql = "SELECT * FROM case_substatus where fromRole =? and user_role = ? and level = ? ";
+			template.query(sql, new Object[] {fromRole,user_role, level},
 					(ResultSet rs, int rowCount) -> {
 						detail.setId(rs.getLong("id"));
+						detail.setFromRole(rs.getString("fromRole"));
 						detail.setUser_role(rs.getString("user_role"));
 						detail.setCase_status(rs.getString("Case_status"));
 						detail.setCaseSubStatus(rs.getString("caseSubStatus"));
