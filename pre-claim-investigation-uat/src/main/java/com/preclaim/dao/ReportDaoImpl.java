@@ -330,7 +330,7 @@ public class ReportDaoImpl implements ReportDao {
 		template.query(sql,new Object[] {region, startDate, endDate}, (ResultSet rs, int rowNum) -> {
 			do 
 			{
-				wip.put(rs.getString("b.toId"),rs.getInt("substatusTotal"));
+				wip.put(rs.getString("toId"),rs.getInt("substatusTotal"));
 			}while(rs.next());
 			
 			return "";
